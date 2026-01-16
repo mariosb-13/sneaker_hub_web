@@ -1,1 +1,60 @@
-<p>navbar works!</p>
+<header class="bg-white pt-3 pb-2 shadow-sm">
+    <div class="container">
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+
+            <a routerLink="/" class="navbar-brand d-flex align-items-center me-4">
+                <img src="assets/icons/Logo_Negro.svg" alt="Logo SneakerHub" class="logo-img">
+                <span class="fw-bold fs-4 ms-2">SneakerHub</span>
+            </a>
+
+            <form class="d-flex flex-grow-1 mx-lg-5 search-container" role="search">
+                <div class="input-group">
+                    <span class="input-group-text search-icon-box rounded-start-pill bg-white border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input class="form-control search-input rounded-end-pill border-start-0 shadow-none" type="search"
+                        placeholder="Buscar" aria-label="Buscar">
+                </div>
+            </form>
+
+            <div class="d-flex align-items-center gap-3 ms-4">
+                <a href="#" class="text-dark fs-5"><i class="bi bi-cart"></i></a>
+                <a href="#" class="text-dark fs-5"><i class="bi bi-person-fill"></i></a>
+            </div>
+        </div>
+
+        <ul class="nav mb-3 border-bottom pb-2">
+            <li class="nav-item">
+                <a class="nav-link text-dark fw-semibold ps-0" href="#">Novedades</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark fw-semibold" href="#">Hombre</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark fw-semibold" href="#">Mujer</a>
+            </li>
+        </ul>
+
+        <div class="d-flex gap-2 overflow-auto pb-2 scroll-container">
+            <button class="btn brand-chip active rounded-pill px-4">All</button>
+
+            <button class="btn brand-chip rounded-pill px-3">
+                <i class="bi bi-triangle-fill me-1"></i> Adidas
+            </button>
+            <button class="btn brand-chip rounded-pill px-3">
+                <i class="bi bi-pentagon-fill me-1"></i> Puma
+            </button>
+            <button class="btn brand-chip rounded-pill px-3">
+                <i class="bi bi-check-lg me-1"></i> Nike
+            </button>
+            <button class="btn brand-chip rounded-pill px-3">
+                <i class="bi bi-person-walking me-1"></i> Jordan
+            </button>
+            <button class="btn brand-chip rounded-pill px-3">
+                <span class="fw-bold fst-italic me-1">N</span> New Balance
+            </button>
+        </div>
+
+    </div>
+</header>
