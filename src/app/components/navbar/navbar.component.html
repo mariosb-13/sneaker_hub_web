@@ -20,7 +20,16 @@
 
             <div class="d-flex align-items-center gap-3 ms-4">
                 <a href="#" class="text-dark fs-5"><i class="bi bi-cart"></i></a>
-                <a href="#" class="text-dark fs-5"><i class="bi bi-person-fill"></i></a>
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle bi bi-person-fill" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    </button>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" routerLink="signin">Signin</a></li>
+                        <li><a class="dropdown-item" routerLink="login">Login</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -40,19 +49,21 @@
             <button class="btn brand-chip active rounded-pill px-4">All</button>
 
             <button class="btn brand-chip rounded-pill px-3">
-                <i class="bi bi-triangle-fill me-1"></i> Adidas
+                <!-- <img src="assets/icons/Adidas_Negro.svg" alt="Logo SneakerHub" class="small"> -->
+
+                <i class=""></i> Adidas
             </button>
             <button class="btn brand-chip rounded-pill px-3">
-                <i class="bi bi-pentagon-fill me-1"></i> Puma
+                <i class=""></i> Puma
             </button>
             <button class="btn brand-chip rounded-pill px-3">
-                <i class="bi bi-check-lg me-1"></i> Nike
+                <i class=""></i> Nike
             </button>
             <button class="btn brand-chip rounded-pill px-3">
-                <i class="bi bi-person-walking me-1"></i> Jordan
+                <i class=""></i> Jordan
             </button>
             <button class="btn brand-chip rounded-pill px-3">
-                <span class="fw-bold fst-italic me-1">N</span> New Balance
+                <i class=""></i> New Balance
             </button>
         </div>
 

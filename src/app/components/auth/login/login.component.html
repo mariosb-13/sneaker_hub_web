@@ -1,1 +1,80 @@
-<p>login works!</p>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+
+      <!-- Card principal -->
+      <div class="card shadow-lg rounded-4 border-0">
+        <div class="card-body p-5 bg-light">
+
+          <h2 class="text-center mb-4 text-primary">Crear cuenta</h2>
+          <p class="text-center text-muted mb-4">
+            Completa los campos para registrarte en nuestra plataforma
+          </p>
+
+          <form>
+
+            <!-- Nombre y Apellidos -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control rounded-pill border border-primary shadow-sm" placeholder="Tu nombre">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Apellidos</label>
+                <input type="text" class="form-control rounded-pill border border-primary shadow-sm" placeholder="Tus apellidos">
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control rounded-pill border border-primary shadow-sm" placeholder="usuario@email.com">
+              <div class="form-text text-muted">
+                Nunca compartiremos tu email con terceros
+              </div>
+            </div>
+
+            <!-- Usuario -->
+            <div class="mb-3">
+              <label class="form-label">Nombre de usuario</label>
+              <input type="text" class="form-control rounded-pill border border-primary shadow-sm" placeholder="username">
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-3">
+              <label class="form-label">Contraseña</label>
+              <input type="password" class="form-control rounded-pill border border-primary shadow-sm" placeholder="********">
+            </div>
+
+            <!-- Repetir contraseña -->
+            <div class="mb-3">
+              <label class="form-label">Repetir contraseña</label>
+              <input type="password" class="form-control rounded-pill border border-primary shadow-sm" placeholder="********">
+            </div>
+
+            <!-- Aceptar condiciones -->
+            <div class="form-check mb-4">
+              <input class="form-check-input" type="checkbox" id="condiciones">
+              <label class="form-check-label" for="condiciones">
+                Acepto los términos y condiciones
+              </label>
+            </div>
+
+            <!-- Botón principal -->
+            <button type="submit" class="btn btn-primary w-100 rounded-pill shadow-sm py-2">
+              Crear cuenta
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+
+      <!-- Pie con llamada a acción -->
+      <p class="text-center text-muted mt-3">
+        ¿Ya tienes cuenta? <a href="#" class="text-primary fw-bold">Inicia sesión</a>
+      </p>
+
+    </div>
+  </div>
+</div>
