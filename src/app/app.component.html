@@ -1,5 +1,7 @@
-<app-navbar></app-navbar>
-<div class="container">
+<app-navbar *ngIf="showLayout"></app-navbar>
+
+<div [ngClass]="{'mx-5': showLayout}">
   <router-outlet></router-outlet>
 </div>
-<app-footer></app-footer>
+
+<app-footer *ngIf="showLayout"></app-footer>

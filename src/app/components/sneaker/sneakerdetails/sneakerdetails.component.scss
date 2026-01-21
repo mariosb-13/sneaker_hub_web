@@ -1,0 +1,18 @@
+// Estilo base de los botones de talla
+.size-btn {
+    width: 50px;       // Ancho fijo
+    height: 40px;      // Alto fijo
+    background-color: #f8f9fa; // Fondo gris muy clarito (Bootstrap light)
+    border-color: #dee2e6;     // Borde sutil
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: #000; // Al pasar el mouse, borde negro
+    }
+}
+
+// Cuando el botón tiene la clase .bg-dark (seleccionado)
+.bg-dark {
+    background-color: #212529 !important;
+    border-color: #212529 !important;
+}

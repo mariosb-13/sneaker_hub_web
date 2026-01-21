@@ -1,0 +1,71 @@
+<div class="container py-5">
+  
+  <div class="row gx-5 align-items-center" *ngIf="sneaker">
+
+    <div class="col-12 col-lg-8 mb-5 mb-lg-0">
+      
+      <div class="d-flex flex-column align-items-center justify-content-center bg-white rounded-3">
+        
+        <img [src]="sneaker.image" 
+             [alt]="sneaker.model" 
+             class="img-fluid mb-4" 
+             style="width: 100%; max-height: 300px; object-fit: contain;">
+
+        <div class="d-flex gap-3 mt-3">
+          <button class="btn btn-light rounded-circle shadow-sm border d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <i class="bi bi-chevron-left text-secondary"></i>
+          </button>
+          <button class="btn btn-light rounded-circle shadow-sm border d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <i class="bi bi-chevron-right text-secondary"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      
+      <h1 class="fw-bold mb-1 text-dark h2">{{ sneaker.model }}</h1>
+      <h2 class="fw-bold mb-2 text-dark h3">{{ sneaker.colorway }}</h2>
+      
+      <p class="text-secondary fs-5 mb-3">{{ sneaker.brand }}</p>
+
+      <p class="fw-bold text-dark display-6 mb-4">{{ sneaker.price }} €</p>
+
+      <div class="mb-4">
+        <p class="small fw-bold mb-2">Selecciona tu talla:</p>
+        
+        <div class="d-flex flex-wrap gap-2">
+          <button *ngFor="let size of sneaker.sizes" 
+                  class="btn btn-size fw-normal"
+                  [class.active]="selectedSize === size"
+                  (click)="selectSize(size)">
+            {{ size }}
+          </button>
+        </div>
+        <div *ngIf="!selectedSize" class="text-muted small mt-2 fst-italic">
+            * Debes seleccionar una talla
+        </div>
+      </div>
+
+      <div class="d-grid mt-5">
+        <button class="btn btn-dark btn-lg rounded-1 py-3 text-white" 
+                [disabled]="!selectedSize">
+          Añadir al carrito
+        </button>
+      </div>
+
+      <div class="mt-4 pt-4 border-top">
+         <p class="small text-secondary">
+             <i class="bi bi-box-seam me-2"></i>Envío gratuito y devoluciones garantizadas.
+         </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div *ngIf="!sneaker" class="text-center py-5">
+    <h3>Cargando producto...</h3>
+  </div>
+
+</div>

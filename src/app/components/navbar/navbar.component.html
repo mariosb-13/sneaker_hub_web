@@ -1,9 +1,8 @@
-<header class="bg-white pt-3 pb-2 shadow-sm">
-    <div class="container">
-
+<header class="bg-white pt-3 pb-2">
+    <div class="mx-5">
         <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
 
-            <a routerLink="/" class="navbar-brand d-flex align-items-center me-4">
+            <a routerLink="/" class="navbar-brand d-flex align-items-center me-4" style="cursor: pointer;">
                 <img src="assets/icons/Logo_Negro.svg" alt="Logo SneakerHub" class="logo-img">
                 <span class="fw-bold fs-4 ms-2">SneakerHub</span>
             </a>
@@ -20,50 +19,61 @@
 
             <div class="d-flex align-items-center gap-3 ms-4">
                 <a href="#" class="text-dark fs-5"><i class="bi bi-cart"></i></a>
+
                 <div class="dropdown">
                     <button class="btn dropdown-toggle bi bi-person-fill" type="button" id="dropdownMenuButton1"
                         data-bs-toggle="dropdown" aria-expanded="false">
                     </button>
 
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" routerLink="signin">Signin</a></li>
-                        <li><a class="dropdown-item" routerLink="login">Login</a></li>
+                        <li><a class="dropdown-item" routerLink="/signin" style="cursor: pointer;">Signin</a></li>
+                        <li><a class="dropdown-item" routerLink="/login" style="cursor: pointer;">Login</a></li>
                     </ul>
                 </div>
             </div>
         </div>
 
+        <!-- Categorias -->
         <ul class="nav mb-3 border-bottom pb-2">
             <li class="nav-item">
-                <a class="nav-link text-dark fw-semibold ps-0" href="#">Novedades</a>
+                <a class="nav-link text-dark fw-semibold ps-0" routerLink="/products/novedades">Novedades</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark fw-semibold" href="#">Hombre</a>
+                <a class="nav-link text-dark fw-semibold" routerLink="/products/hombre">Hombre</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark fw-semibold" href="#">Mujer</a>
+                <a class="nav-link text-dark fw-semibold" routerLink="/products/mujer">Mujer</a>
             </li>
         </ul>
 
+        <!-- Pills de Marcas -->
         <div class="d-flex gap-2 overflow-auto pb-2 scroll-container">
-            <button class="btn brand-chip active rounded-pill px-4">All</button>
+            <button class="btn brand-chip active rounded-pill px-4" routerLink="/products/all">All</button>
 
-            <button class="btn brand-chip rounded-pill px-3">
-                <!-- <img src="assets/icons/Adidas_Negro.svg" alt="Logo SneakerHub" class="small"> -->
-
-                <i class=""></i> Adidas
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/adidas">
+                <img src="assets/icons/Adidas_Negro.svg" alt="Logo" class="logo-img mb-2"
+                    style="height: 30px; width: 40px;">
+                Adidas
             </button>
-            <button class="btn brand-chip rounded-pill px-3">
-                <i class=""></i> Puma
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/puma">
+                <img src="assets/icons/Puma_Negro.svg" alt="Logo" class="logo-img mb-2"
+                    style="height: 30px; width: 40px;">
+                Puma
             </button>
-            <button class="btn brand-chip rounded-pill px-3">
-                <i class=""></i> Nike
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/nike">
+                <img src="assets/icons/Nike_Negro.svg" alt="Logo" class="logo-img mb-2"
+                    style="height: 30px; width: 50px;">
+                Nike
             </button>
-            <button class="btn brand-chip rounded-pill px-3">
-                <i class=""></i> Jordan
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/jordan">
+                <img src="assets/icons/Jordan_Negro.svg" alt="Logo" class="logo-img mb-2"
+                    style="height: 30px; width: 40px;">
+                Jordan
             </button>
-            <button class="btn brand-chip rounded-pill px-3">
-                <i class=""></i> New Balance
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/new-balance">
+                <img src="assets/icons/NBalance_Negro.svg" alt="Logo" class="logo-img mb-2"
+                    style="height: 30px; width: 50px;">
+                New Balance
             </button>
         </div>
 

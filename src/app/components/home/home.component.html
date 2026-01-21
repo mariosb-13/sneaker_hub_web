@@ -1,1 +1,97 @@
-<p>home works!</p>
+<div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+
+  <div class="carousel-inner">
+
+    <div class="carousel-item active">
+      <img src="assets/images/banner_1.jpg" class="d-block w-100 bg-secondary" alt="Nuevos Lanzamientos"
+        style="height: 600px; object-fit: cover; filter: brightness(0.8);">
+      <div class="carousel-caption d-none d-md-block text-start">
+        <h5 class="display-4 fw-bold">Nuevos Lanzamientos</h5>
+        <p class="fs-5">Descubre la última colección de Jordan y Nike.</p>
+        <button class="btn btn-light rounded-pill px-4 fw-bold mt-2" routerLink="/products/novedades">Ver Ahora</button>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <img src="assets/images/banner_2.jpeg" class="d-block w-100 bg-secondary" alt="Colección Verano"
+        style="height: 600px; object-fit: cover; filter: brightness(0.8);">
+      <div class="carousel-caption d-none d-md-block text-start">
+        <h5 class="display-4 fw-bold">Estilo Urbano</h5>
+        <p class="fs-5">Las mejores siluetas para tu día a día.</p>
+        <button class="btn btn-light rounded-pill px-4 fw-bold mt-2" routerLink="/products/all">Comprar</button>
+      </div>
+    </div>
+
+    <div class="carousel-item">
+      <img src="assets/images/banner_3.jpg" class="d-block w-100 bg-secondary" alt="Ofertas Especiales"
+        style="height: 600px; object-fit: cover; filter: brightness(0.8);">
+      <div class="carousel-caption d-none d-md-block text-start">
+        <h5 class="display-4 fw-bold">Ofertas Exclusivas</h5>
+        <p class="fs-5">Hasta un 30% de descuento en modelos seleccionados.</p>
+        <button class="btn btn-light rounded-pill px-4 fw-bold mt-2" routerLink="/products/all">Ver Ofertas</button>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <div class="col-md-4">
+      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100">
+        <img src="assets/images/img_hombre.jpg" class="card-img" alt="Hombre"
+          style="height: 400px; object-fit: cover; opacity: 0.9;">
+        <div class="card-img-overlay d-flex align-items-end justify-content-center pb-4">
+          <button routerLink="/products/hombre"
+            class="btn btn-white bg-black text-white rounded-pill px-4 py-2 gap-2 shadow">
+            Comprar para hombre
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100">
+        <img src="assets/images/img_mujer.jpg" class="card-img" alt="Mujer"
+          style="height: 400px; object-fit: cover; opacity: 0.9;">
+        <div class="card-img-overlay d-flex align-items-end justify-content-center pb-4">
+          <button routerLink="/products/mujer"
+            class="btn btn-white bg-white text-black rounded-pill px-4 py-2 gap-2 shadow">
+            Comprar para mujer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100">
+        <img src="assets/images/img_sneakers.jpg" class="card-img" alt="Novedades"
+          style="height: 400px; object-fit: cover; opacity: 0.9;">
+        <div class="card-img-overlay d-flex align-items-end justify-content-center pb-4">
+          <button routerLink="/products/novedades"
+            class="btn btn-white bg-black text-white rounded-pill px-4 py-2 gap-2 shadow">
+            Ver novedades
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

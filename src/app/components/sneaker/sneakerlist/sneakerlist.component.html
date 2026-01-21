@@ -1,1 +1,111 @@
-<p>sneakerlist</p>
+<div class="container py-4"> <div class="row">
+    
+    <div class="col-lg-3 mb-4">
+      <h5 class="fw-bold mb-3">Filtrar por...</h5>
+
+      <div class="accordion" id="accordionFilters">
+        
+        <div class="accordion-item border-0 border-bottom">
+          <h2 class="accordion-header">
+            <button class="accordion-button shadow-none bg-transparent px-0 fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#filterMarca">
+              Marca
+            </button>
+          </h2>
+          <div id="filterMarca" class="accordion-collapse collapse show" data-bs-parent="#accordionFilters">
+            <div class="accordion-body px-0 pt-0 pb-3">
+              <div class="form-check">
+                <input class="form-check-input shadow-none" type="checkbox" id="checkNike">
+                <label class="form-check-label small" for="checkNike">Nike</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input shadow-none" type="checkbox" id="checkAdidas">
+                <label class="form-check-label small" for="checkAdidas">Adidas</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input shadow-none" type="checkbox" id="checkJordan">
+                <label class="form-check-label small" for="checkJordan">Jordan</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 border-bottom">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed shadow-none bg-transparent px-0 fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#filterModelo">
+              Modelos
+            </button>
+          </h2>
+          <div id="filterModelo" class="accordion-collapse collapse" data-bs-parent="#accordionFilters">
+            <div class="accordion-body px-0 pt-0 pb-3">
+              <span class="small text-secondary">Selecciona marca primero</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 border-bottom">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed shadow-none bg-transparent px-0 fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#filterTalla">
+              Talla
+            </button>
+          </h2>
+          <div id="filterTalla" class="accordion-collapse collapse" data-bs-parent="#accordionFilters">
+            <div class="accordion-body px-0 pt-0 pb-3 d-flex flex-wrap gap-2">
+               <button class="btn btn-sm btn-outline-dark rounded-0">38</button>
+               <button class="btn btn-sm btn-outline-dark rounded-0">40</button>
+               <button class="btn btn-sm btn-outline-dark rounded-0">42</button>
+               <button class="btn btn-sm btn-outline-dark rounded-0">44</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header">
+              <button class="accordion-button shadow-none bg-transparent px-0 fw-semibold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#filterPrecio">
+                Precio
+              </button>
+            </h2>
+            <div id="filterPrecio" class="accordion-collapse collapse show" data-bs-parent="#accordionFilters">
+              <div class="accordion-body px-0 pt-0 pb-3">
+                <label class="form-label small d-flex justify-content-between">
+                    <span>0€</span>
+                    <span>1.000€</span>
+                </label>
+                <input type="range" class="form-range" min="0" max="1000" id="priceRange">
+              </div>
+            </div>
+          </div>
+
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0">{{ categoryTitle }}</h2>
+            <p class="text-secondary small m-0">Mostrando {{ sneakers.length }} resultados</p>
+        </div>
+
+        <div class="dropdown">
+            <button class="btn btn-light border dropdown-toggle px-3" type="button" data-bs-toggle="dropdown">
+              Ordenar por
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+              <li><a class="dropdown-item" href="#">Relevancia</a></li>
+              <li><a class="dropdown-item" href="#">Precio: Menor a Mayor</a></li>
+              <li><a class="dropdown-item" href="#">Precio: Mayor a Menor</a></li>
+              <li><a class="dropdown-item" href="#">Lo más nuevo</a></li>
+            </ul>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-12 col-sm-6 col-lg-4" *ngFor="let item of sneakers">
+          <app-sneaker-resume [sneaker]="item"></app-sneaker-resume>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

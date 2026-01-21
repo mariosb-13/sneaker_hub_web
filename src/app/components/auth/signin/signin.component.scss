@@ -1,0 +1,17 @@
+// Elimina el borde azul al hacer clic
+.form-control:focus {
+    border-color: #ffffff00;
+    box-shadow: none;
+}
+
+// Asegura bordes limpios en la unión icono-input
+.input-group {
+    .input-group-text {
+        border-right: none;
+        border-color: transparent;
+    }
+
+    .form-control {
+        border-left: none;
+    }
+}

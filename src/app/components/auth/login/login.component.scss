@@ -1,0 +1,14 @@
+.form-control:focus {
+    border-color: #ffffff00;
+    box-shadow: none;
+}
+
+.input-group {
+    .input-group-text {
+        border-right: none;
+    }
+
+    .form-control {
+        border-left: none;
+    }
+}

@@ -1,80 +1,64 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
+<div class="container-fluid d-flex flex-column justify-content-center align-items-center mt-4 bg-white">
 
-      <!-- Card principal -->
-      <div class="card shadow-lg rounded-4 border-0">
-        <div class="card-body p-5 bg-light">
+  <div class="text-center mb-4 w-100 pt-4 pt-md-0">
+    <div class="d-flex justify-content-center align-items-center gap-3">
+      <img src="assets/icons/Logo_Negro.svg"  routerLink="home" alt="SneakerHub Logo" style="height: 50px; object-fit: contain; cursor: pointer ">
+      <h2 class="fw-bold m-0 text-dark">SneakerHub</h2>
+    </div>
+    <hr>
 
-          <h2 class="text-center mb-4 text-primary">Crear cuenta</h2>
-          <p class="text-center text-muted mb-4">
-            Completa los campos para registrarte en nuestra plataforma
-          </p>
+  </div>
 
-          <form>
+  <div class="card border-0 shadow-sm p-4"
+    style="max-width: 400px; width: 100%; background-color: #dcdcdc; border-radius: 10px;">
 
-            <!-- Nombre y Apellidos -->
-            <div class="row g-3 mb-3">
-              <div class="col-md-6">
-                <label class="form-label">Nombre</label>
-                <input type="text" class="form-control rounded-pill border border-primary shadow-sm" placeholder="Tu nombre">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Apellidos</label>
-                <input type="text" class="form-control rounded-pill border border-primary shadow-sm" placeholder="Tus apellidos">
-              </div>
-            </div>
+    <div class="card-body">
+      <h3 class="text-center mb-4 text-dark">Iniciar Sesión</h3>
 
-            <!-- Email -->
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control rounded-pill border border-primary shadow-sm" placeholder="usuario@email.com">
-              <div class="form-text text-muted">
-                Nunca compartiremos tu email con terceros
-              </div>
-            </div>
-
-            <!-- Usuario -->
-            <div class="mb-3">
-              <label class="form-label">Nombre de usuario</label>
-              <input type="text" class="form-control rounded-pill border border-primary shadow-sm" placeholder="username">
-            </div>
-
-            <!-- Contraseña -->
-            <div class="mb-3">
-              <label class="form-label">Contraseña</label>
-              <input type="password" class="form-control rounded-pill border border-primary shadow-sm" placeholder="********">
-            </div>
-
-            <!-- Repetir contraseña -->
-            <div class="mb-3">
-              <label class="form-label">Repetir contraseña</label>
-              <input type="password" class="form-control rounded-pill border border-primary shadow-sm" placeholder="********">
-            </div>
-
-            <!-- Aceptar condiciones -->
-            <div class="form-check mb-4">
-              <input class="form-check-input" type="checkbox" id="condiciones">
-              <label class="form-check-label" for="condiciones">
-                Acepto los términos y condiciones
-              </label>
-            </div>
-
-            <!-- Botón principal -->
-            <button type="submit" class="btn btn-primary w-100 rounded-pill shadow-sm py-2">
-              Crear cuenta
-            </button>
-
-          </form>
-
+      <form>
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
+            <i class="bi bi-at fs-5"></i>
+          </span>
+          <input type="email" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+            placeholder="Correo">
         </div>
-      </div>
 
-      <!-- Pie con llamada a acción -->
-      <p class="text-center text-muted mt-3">
-        ¿Ya tienes cuenta? <a href="#" class="text-primary fw-bold">Inicia sesión</a>
-      </p>
+        <div class="input-group mb-2">
+          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
+            <i class="bi bi-key fs-5"></i>
+          </span>
+          <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+            placeholder="Contraseña">
+        </div>
 
+        <div class="mb-4">
+          <a href="#" class="text-decoration-none text-secondary small fw-bold">
+            He olvidado la contraseña
+          </a>
+        </div>
+
+        <div class="d-grid gap-2 mb-3">
+          <button class="btn rounded-pill py-2 text-white" style="background-color: #000;" type="button"
+            routerLink="/home">
+            Iniciar Sesión
+          </button>
+        </div>
+
+        <div class="d-grid gap-2 mb-4">
+          <button class="btn btn-danger rounded-pill py-2" type="button" routerLink="/home">
+            <i class="bi bi-google me-2"></i> Iniciar Sesión
+          </button>
+        </div>
+
+        <div class="text-center">
+          <span class="text-secondary small">¿No tienes cuenta? </span>
+          <a routerLink="/signin" class="text-decoration-none text-dark small fw-bold text-decoration-underline">
+            Únete a nosotros
+          </a>
+        </div>
+
+      </form>
     </div>
   </div>
 </div>
