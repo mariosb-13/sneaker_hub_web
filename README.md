@@ -1,119 +1,117 @@
-# SneakerHub – Store
+# SneakerHub – Frontend & UI Layout Architecture
 
 ## Descripción del Proyecto
 
-**SneakerHub** es una aplicación web orientada a la exposición y venta de zapatillas de colección. Este repositorio corresponde a la primera fase del proyecto, centrada en la **maquetación y diseño de interfaces** mediante **Angular** y **Bootstrap 5**.
+**SneakerHub** es una aplicación web de comercio electrónico (SPA) desarrollada con **Angular 19**.
 
-El objetivo principal de esta fase es la implementación de al menos el **50 % de las vistas principales**, priorizando una experiencia de usuario clara, un diseño totalmente responsivo y una correcta organización del proyecto basada en componentes reutilizables.
+Este repositorio abarca la fase de **Maquetación y Diseño de Interfaz**, con el objetivo de establecer una arquitectura visual robusta, escalable y altamente responsiva. El desarrollo se ha centrado en la implementación de patrones de diseño modernos, priorizando la experiencia de usuario en dispositivos móviles (Mobile First) sin comprometer la funcionalidad en entornos de escritorio.
 
-La aplicación se encuentra desplegada y accesible públicamente en el siguiente enlace:
-
-**Demo en producción (Render):**
+**Demo en producción:**
 [https://sneaker-hub-web.onrender.com](https://sneaker-hub-web.onrender.com)
+
+---
+
+## Stack Tecnológico
+
+* **Framework:** Angular 19 (Arquitectura basada en Standalone Components).
+* **Maquetación:** HTML5 Semántico y Bootstrap 5.
+* **Estilos:** SCSS (Sass) para personalización avanzada y CSS nativo.
+* **Iconografía:** Bootstrap Icons.
+* **Control de Versiones:** Git.
 
 ---
 
 ## Estructura del Proyecto
 
-La aplicación sigue las buenas prácticas recomendadas por Angular, separando responsabilidades y organizando la interfaz en componentes bien definidos:
+El proyecto sigue una arquitectura modular organizada por funcionalidad ("Feature-based structure"), separando claramente las responsabilidades de cada sección de la aplicación. A continuación se detalla la organización del directorio `src/app`:
 
-* **Auth**
-  Gestión de autenticación, incluyendo:
+### 1. Componentes (`/components`)
 
-  * `Login`
-  * `Signin` (registro de usuarios)
+Directorio principal que agrupa todas las vistas y bloques lógicos de la interfaz:
 
-* **Sneaker**
-  Gestión del catálogo de productos:
+* **Auth (`/auth`):** Contiene los componentes relacionados con la gestión de usuarios.
+* `/login`: Formulario de inicio de sesión.
+* `/signin`: Formulario de registro de nuevos usuarios.
 
-  * `SneakerList`: galería dinámica de zapatillas
-  * `SneakerDetails`: vista detallada de cada modelo
-  * `SneakerResume`: componente reutilizable para mostrar información resumida de productos
 
-* **Core UI**
-  Componentes globales compartidos:
+* **Estructura Global:**
+* `/navbar`: Barra de navegación principal. Incluye lógica responsiva para colapsar menús en móvil y reorganizar elementos en escritorio.
+* `/footer`: Pie de página con enlaces de navegación secundaria e información legal.
 
-  * `Navbar`
-  * `Footer`
 
-* **Home**
-  Página principal de aterrizaje con secciones destacadas.
+* **Home (`/home`):** Componente de la página de inicio (Landing Page). Gestiona la lógica de visualización condicional entre el banner estático (móvil) y el carrusel dinámico (escritorio).
+* **Sneaker (`/sneaker`):** Módulo funcional para la gestión del catálogo. Incluye tanto el listado de productos (`list`) como la vista de detalle individual (`details`).
 
-* **Models**
-  Definición de interfaces y modelos de datos para garantizar consistencia y tipado fuerte.
+### 2. Modelos de Datos (`/models`)
 
----
+Directorio destinado a las interfaces y tipos de TypeScript (por ejemplo, `sneaker.model.ts`). Su función es garantizar el tipado estricto de los datos que fluyen por la aplicación, asegurando la consistencia entre la vista y la lógica de negocio.
 
-## Enrutamiento (Angular Router)
+### 3. Configuración Raíz
 
-Se ha implementado un sistema de rutas dinámicas utilizando **Angular Router**, permitiendo una navegación clara y escalable:
+Archivos de configuración a nivel de aplicación (Angular Standalone):
 
-* `/home` – Página principal
-* `/login` y `/signin` – Vistas de autenticación
-* `/products/:category` – Listado filtrado por categoría
-* `/product/:id` – Vista de detalles mediante parámetros dinámicos
-
-El uso de parámetros en la URL permite una navegación semántica y facilita la escalabilidad futura del proyecto.
+* `app.routes.ts`: Definición del enrutamiento y carga de componentes (Lazy Loading).
+* `app.config.ts`: Configuración global de proveedores, incluyendo la inicialización del Router y otros servicios transversales.
+* `app.component.*`: Componente raíz que actúa como contenedor principal (`<router-outlet>`).
 
 ---
 
-## Maquetación y Uso de Bootstrap 5
+## Estrategia de Maquetación y Diseño
 
-El diseño visual de la aplicación se ha desarrollado principalmente con **Bootstrap 5**, reduciendo al mínimo el uso de estilos personalizados:
+La interfaz se ha construido utilizando una combinación de las utilidades de Bootstrap para la estructura y SCSS personalizado para la identidad visual.
 
-* **Sistema de rejilla**
-  Uso de `container`, `row` y `col` para una adaptación fluida a diferentes tamaños de pantalla.
+### Sistema de Rejilla y Adaptabilidad
 
-* **Componentes**
-  Implementación de `navbars` responsivas, `cards` para el catálogo de productos y formularios con clases utilitarias.
+La aplicación implementa un diseño fluido que responde a los puntos de ruptura estándar (`sm`, `md`, `lg`, `xl`):
 
-* **Diseño responsivo**
-  Uso de breakpoints (`sm`, `md`, `lg`) para garantizar una experiencia consistente en dispositivos móviles, tablets y escritorio.
+1. **Grid System:** Uso de `container-fluid` para secciones de ancho completo (Headers, Heros móviles) y `container` para limitar el ancho máximo de contenido en pantallas grandes (Carruseles, Grids de productos).
+2. **Flexbox:** Alineación y distribución de elementos mediante clases de utilidad (`d-flex`, `justify-content-between`, `align-items-center`), permitiendo reordenar elementos visualmente sin alterar el DOM.
 
-### Uso de SCSS
+### Experiencia Diferenciada por Dispositivo
 
-El uso de **SCSS** se limita a aquellos casos donde Bootstrap no cubre las necesidades de personalización:
+Se han implementado estrategias de renderizado condicional para optimizar la UX:
 
-* Definición de variables de color corporativas.
-* Efectos hover personalizados en tarjetas de producto.
-* Ajustes específicos de layout no cubiertos por clases utilitarias estándar.
+* **Home Component:**
+* **Móvil:** Se renderiza una imagen estática vertical (`65vh`) con un overlay degradado. Esto mejora el rendimiento y la legibilidad en pantallas verticales, eliminando la carga innecesaria de scripts de carrusel.
+* **Escritorio:** Se renderiza un carrusel interactivo encapsulado en un contenedor con bordes redondeados (`rounded-4`) y sombras, alineado con el grid de productos inferior.
 
----
 
-## Instalación y Ejecución en Local
+* **Navegación:** Adaptación dinámica del menú, pasando de un menú hamburguesa lateral (Offcanvas o Dropdown) en móviles a una barra horizontal expandida en escritorio.
 
-1. Clonar el repositorio:
+### Estilizado Avanzado (SCSS)
 
-   ```bash
-   git clone [URL-del-repositorio]
-   ```
-2. Instalar dependencias:
+El uso de SCSS se ha reservado para aspectos que requieren mayor precisión que la ofrecida por el framework base:
 
-   ```bash
-   npm install
-   ```
-3. Ejecutar el servidor de desarrollo:
-
-   ```bash
-   ng serve
-   ```
-4. Acceder desde el navegador:
-
-   ```
-   http://localhost:4200
-   ```
+* **Control de Imágenes:** Aplicación estricta de `object-fit: cover` y alturas fijas en las tarjetas de producto para evitar deformaciones y mantener la alineación del grid.
+* **Micro-interacciones:** Implementación de efectos `hover` con transformaciones de escala (`scale 1.05`) y transiciones suaves para mejorar la interactividad.
+* **Legibilidad:** Creación de capas de superposición (overlays) con degradados `linear-gradient` para asegurar el contraste del texto sobre imágenes dinámicas.
 
 ---
 
-## Dificultades Encontradas y Mejoras Futuras
+## Instalación y Ejecución
 
-### Dificultades
+Para desplegar el entorno de desarrollo local:
 
-* Ajuste del diseño responsivo en la vista de detalle del producto, manteniendo una jerarquía visual clara en pantallas pequeñas.
+1. **Clonar el repositorio:**
+```bash
+git clone [URL-del-repositorio]
 
-### Mejoras Futuras
+```
 
-* Integración con una API real para la gestión de productos.
-* Implementación de servicios y gestión de estado para el carrito de compras.
-* Filtros avanzados por talla, precio y marca.
-* Autenticación completa y persistencia de sesión.
+
+2. **Instalar dependencias:**
+```bash
+npm install
+
+```
+
+
+3. **Ejecutar servidor:**
+```bash
+ng serve
+
+```
+
+
+4. **Acceso:**
+Abrir el navegador en `http://localhost:4200`.
