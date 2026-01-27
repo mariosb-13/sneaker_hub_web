@@ -1,6 +1,6 @@
 /* Ajuste del tamaño del logo */
 .logo-img {
-    height: 40px; /* Ajusta este valor según el tamaño real de tu logo */
+    height: 45px;
     width: auto;
 }
 
@@ -35,9 +35,15 @@
     background-color: #e5e7eb;
 }
 
+/* Estilo cuando el chip está activo */
 .brand-chip.active {
-    background-color: #212529; /* Negro */
-    color: white;
+    background-color: #212529 !important; 
+    color: #ffffff !important;            
+}
+
+/* Invertir el color de la imagen (logo) cuando el padre está activo */
+.brand-chip.active img {
+    filter: invert(100%) brightness(200%);
 }
 
 /* Ocultar barra de scroll en los filtros si hay muchos */

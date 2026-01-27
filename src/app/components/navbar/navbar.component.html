@@ -48,32 +48,51 @@
 
         <!-- Pills de Marcas -->
         <div class="d-flex gap-2 overflow-auto pb-2 scroll-container">
-            <button class="btn brand-chip active rounded-pill px-4" routerLink="/products/all">All</button>
 
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/adidas">
+            <button class="btn brand-chip rounded-pill px-4" routerLink="/products/all" routerLinkActive="active"
+                [routerLinkActiveOptions]="{exact: true}">
+                All
+            </button>
+
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/adidas"
+                routerLinkActive="active">
                 <img src="assets/icons/Adidas_Negro.svg" alt="Logo" class="logo-img mb-2"
                     style="height: 30px; width: 40px;">
                 Adidas
             </button>
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/puma">
+
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/puma"
+                routerLinkActive="active">
                 <img src="assets/icons/Puma_Negro.svg" alt="Logo" class="logo-img mb-2"
                     style="height: 30px; width: 40px;">
                 Puma
             </button>
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/nike">
+
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/nike"
+                routerLinkActive="active">
                 <img src="assets/icons/Nike_Negro.svg" alt="Logo" class="logo-img mb-2"
                     style="height: 30px; width: 50px;">
                 Nike
             </button>
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/jordan">
+
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/jordan"
+                routerLinkActive="active">
                 <img src="assets/icons/Jordan_Negro.svg" alt="Logo" class="logo-img mb-2"
-                    style="height: 30px; width: 40px;">
+                    style="height: 35px; width: 40px;">
                 Jordan
             </button>
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/new-balance">
+
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/new Balance"
+                routerLinkActive="active">
                 <img src="assets/icons/NBalance_Negro.svg" alt="Logo" class="logo-img mb-2"
                     style="height: 30px; width: 50px;">
                 New Balance
+            </button>
+            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/off-White"
+                routerLinkActive="active">
+                <img src="assets/icons/off.svg" alt="Logo" class="logo-img mb-2"
+                    style="height: 35px; width: 50px;">
+                Off-White
             </button>
         </div>
 
