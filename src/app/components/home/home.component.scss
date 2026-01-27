@@ -1,0 +1,31 @@
+/* --- Héroe Móvil --- */
+.hero-mobile-img {
+  height: 60vh; 
+  filter: brightness(0.75);
+}
+
+/* --- Carrusel Desktop --- */
+.carousel-custom-img {
+  height: 600px; 
+  filter: brightness(0.8);
+}
+
+.carousel-caption-custom {
+  bottom: 15%; 
+}
+
+/* --- Tarjetas de Categoría --- */
+.card-category-img {
+  height: 400px;
+  transition: transform 0.5s ease;
+}
+
+/* Efecto Zoom al pasar el mouse */
+.group-hover:hover .card-category-img {
+  transform: scale(1.05);
+}
+
+/* Degradado negro en la parte inferior de las cards para leer el texto */
+.gradient-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%);
+}

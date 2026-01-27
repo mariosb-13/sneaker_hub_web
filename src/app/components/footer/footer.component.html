@@ -1,96 +1,120 @@
-<footer class="text-center text-lg-start bg-body-tertiary text-muted border-top mt-auto">
+<footer class="bg-body-tertiary text-muted border-top mt-auto">
 
-  <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
-    <div class="me-5 d-none d-lg-block">
-      <span>Conéctate con nosotros en redes sociales:</span>
-    </div>
+  <!-- REDES SOCIALES -->
+  <section class="border-bottom">
+    <div
+      class="container d-flex flex-column flex-lg-row justify-content-center justify-content-lg-between align-items-center gap-3 py-4 text-center text-lg-start">
 
-    <div>
-      <a href="#" class="me-4 text-reset text-decoration-none">
-        <i class="bi bi-facebook fs-5"></i>
-      </a>
-      <a href="#" class="me-4 text-reset text-decoration-none">
-        <i class="bi bi-twitter-x fs-5"></i>
-      </a>
-      <a href="#" class="me-4 text-reset text-decoration-none">
-        <i class="bi bi-instagram fs-5"></i>
-      </a>
-      <a href="#" class="me-4 text-reset text-decoration-none">
-        <i class="bi bi-tiktok fs-5"></i>
-      </a>
+      <span class="d-none d-lg-block">
+        Conéctate con nosotros en redes sociales:
+      </span>
+
+      <div class="d-flex gap-4">
+        <a href="#" class="text-reset text-decoration-none fs-5">
+          <i class="bi bi-facebook"></i>
+        </a>
+        <a href="#" class="text-reset text-decoration-none fs-5">
+          <i class="bi bi-twitter-x"></i>
+        </a>
+        <a href="#" class="text-reset text-decoration-none fs-5">
+          <i class="bi bi-instagram"></i>
+        </a>
+        <a href="#" class="text-reset text-decoration-none fs-5">
+          <i class="bi bi-tiktok"></i>
+        </a>
+      </div>
     </div>
   </section>
 
-  <section class="">
-    <div class="container text-center text-md-start mt-5">
-      <div class="row mt-3">
+  <!-- CONTENIDO -->
+  <section>
+    <div class="container py-5">
+      <div class="row gy-4 text-center text-md-start">
 
-        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-
-
+        <!-- BRAND -->
+        <div class="col-12 col-md-6 col-lg-4">
           <h6
-            class="text-uppercase fw-bold mb-4 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
-            <img src="assets/icons/Logo_Negro.svg" alt="Logo SneakerHub" class="logo-img mb-2" style="height: 40px; width: auto;">
+            class="text-uppercase fw-bold mb-3 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+            <img
+              src="assets/icons/Logo_Negro.svg"
+              alt="Logo SneakerHub"
+              style="height: 40px; width: auto;">
             SneakerHub
           </h6>
-          <p>
+
+          <p class="mb-0">
             Tu destino definitivo para sneakers exclusivas. Encontramos las zapatillas más buscadas de Nike, Adidas,
             Jordan y más. Autenticidad 100% garantizada en todos nuestros productos.
           </p>
         </div>
 
-        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-          <h6 class="text-uppercase fw-bold mb-4">
-            Colecciones
-          </h6>
-          <p>
-            <a routerLink="/products/hombre" class="text-reset text-decoration-none">Hombre</a>
-          </p>
-          <p>
-            <a routerLink="/products/mujer" class="text-reset text-decoration-none">Mujer</a>
-          </p>
-          <p>
-            <a routerLink="/products/novedades" class="text-reset text-decoration-none">Novedades</a>
-          </p>
-          <p>
-            <a routerLink="/products/all" class="text-reset text-decoration-none">Ver Todo</a>
-          </p>
+        <!-- COLECCIONES -->
+        <div class="col-6 col-md-3 col-lg-2">
+          <h6 class="text-uppercase fw-bold mb-3">Colecciones</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2">
+              <a routerLink="/products/hombre" class="text-reset text-decoration-none">Hombre</a>
+            </li>
+            <li class="mb-2">
+              <a routerLink="/products/mujer" class="text-reset text-decoration-none">Mujer</a>
+            </li>
+            <li class="mb-2">
+              <a routerLink="/products/novedades" class="text-reset text-decoration-none">Novedades</a>
+            </li>
+            <li>
+              <a routerLink="/products/all" class="text-reset text-decoration-none">Ver todo</a>
+            </li>
+          </ul>
         </div>
 
-        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-          <h6 class="text-uppercase fw-bold mb-4">
-            Tu Cuenta
-          </h6>
-          <p>
-            <a routerLink="/login" class="text-reset text-decoration-none">Iniciar Sesión</a>
-          </p>
-          <p>
-            <a routerLink="/signin" style="cursor: pointer;" class="text-reset text-decoration-none">Registrarse</a>
-          </p>
-          <p>
-            <a href="#" class="text-reset text-decoration-none">Mis Pedidos</a>
-          </p>
-          <p>
-            <a href="#" class="text-reset text-decoration-none">Ayuda</a>
-          </p>
+        <!-- CUENTA -->
+        <div class="col-6 col-md-3 col-lg-2">
+          <h6 class="text-uppercase fw-bold mb-3">Tu cuenta</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2">
+              <a routerLink="/login" class="text-reset text-decoration-none">Iniciar sesión</a>
+            </li>
+            <li class="mb-2">
+              <a routerLink="/signin" class="text-reset text-decoration-none">Registrarse</a>
+            </li>
+            <li class="mb-2">
+              <a href="#" class="text-reset text-decoration-none">Mis pedidos</a>
+            </li>
+            <li>
+              <a href="#" class="text-reset text-decoration-none">Ayuda</a>
+            </li>
+          </ul>
         </div>
 
-        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-          <h6 class="text-uppercase fw-bold mb-4">Contacto</h6>
-          <p><i class="bi bi-geo-alt-fill me-3"></i> Gran Vía 24, Madrid, ES</p>
-          <p>
-            <i class="bi bi-envelope-fill me-3"></i>
-            info&#64;sneakerhub.com
-          </p>
-          <p><i class="bi bi-telephone-fill me-3"></i> +34 912 345 678</p>
-          <p><i class="bi bi-clock-fill me-3"></i> L-V: 10:00 - 20:00</p>
+        <!-- CONTACTO -->
+        <div class="col-12 col-lg-4">
+          <h6 class="text-uppercase fw-bold mb-3">Contacto</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2">
+              <i class="bi bi-geo-alt-fill me-2"></i> Gran Vía 24, Madrid, ES
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-envelope-fill me-2"></i> info&#64;sneakerhub.com
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-telephone-fill me-2"></i> +34 912 345 678
+            </li>
+            <li>
+              <i class="bi bi-clock-fill me-2"></i> L-V: 10:00 - 20:00
+            </li>
+          </ul>
         </div>
+
       </div>
     </div>
   </section>
 
-  <div class="text-center p-4 bg-dark text-white">
-    © 2026 Copyright:
-    <a class="text-reset fw-bold text-decoration-none" routerLink="/">SneakerHub.com</a>
+  <!-- COPYRIGHT -->
+  <div class="bg-dark text-white text-center py-3">
+    © 2026
+    <a routerLink="/" class="fw-bold text-reset text-decoration-none">
+      SneakerHub.com
+    </a>
   </div>
+
 </footer>

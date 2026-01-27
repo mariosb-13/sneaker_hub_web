@@ -1,98 +1,93 @@
-<header class="bg-white pt-3 pb-2">
-    <div class="mx-5">
-        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+<header class="bg-white pt-3 pb-2 sticky-top">
+    <div class="mx-2 mx-lg-5">
 
-            <a routerLink="/" class="navbar-brand d-flex align-items-center me-4" style="cursor: pointer;">
-                <img src="assets/icons/Logo_Negro.svg" alt="Logo SneakerHub" class="logo-img">
-                <span class="fw-bold fs-4 ms-2">SneakerHub</span>
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-nowrap">
+
+            <a routerLink="/" class="navbar-brand d-flex align-items-center flex-shrink-0 me-0 me-lg-3"
+                style="cursor: pointer;">
+                <img src="assets/icons/Logo_Negro.svg" alt="Logo" class="logo-img" style="height: 30px;">
+
+                <span class="fw-bold ms-1 d-block d-sm-none fs-5">SneakerHub</span>
+                <span class="fw-bold ms-2 d-none d-sm-block fs-4">SneakerHub</span>
             </a>
 
-            <form class="d-flex flex-grow-1 mx-lg-5 search-container" role="search">
-                <div class="input-group">
-                    <span class="input-group-text search-icon-box rounded-start-pill bg-white border-end-0">
+            <form class="d-flex flex-grow-1 mx-2 mx-lg-5 search-container" role="search" style="min-width: 100px;">
+                <div class="input-group w-100">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-pill text-secondary px-2 px-lg-3">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input class="form-control search-input rounded-end-pill border-start-0 shadow-none" type="search"
-                        placeholder="Buscar" aria-label="Buscar">
+                    <input class="form-control border-start-0 rounded-end-pill shadow-none border-secondary-subtle px-2"
+                        type="search" placeholder="Buscar" aria-label="Buscar">
                 </div>
             </form>
 
-            <div class="d-flex align-items-center gap-3 ms-4">
-                <a href="#" class="text-dark fs-5"><i class="bi bi-cart"></i></a>
+            <div class="d-flex align-items-center gap-2 gap-lg-3 flex-shrink-0 ms-0 ms-lg-3">
+                <a href="#" class="text-dark fs-5">
+                    <i class="bi bi-cart"></i>
+                </a>
 
                 <div class="dropdown">
-                    <button class="btn dropdown-toggle bi bi-person-fill" type="button" id="dropdownMenuButton1"
-                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn p-0 fs-5 bi bi-person-fill border-0" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                     </button>
-
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" routerLink="/signin" style="cursor: pointer;">Signin</a></li>
-                        <li><a class="dropdown-item" routerLink="/login" style="cursor: pointer;">Login</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li><a class="dropdown-item" routerLink="/signin">Signin</a></li>
+                        <li><a class="dropdown-item" routerLink="/login">Login</a></li>
                     </ul>
                 </div>
             </div>
+
         </div>
 
-        <!-- Categorias -->
-        <ul class="nav mb-3 border-bottom pb-2">
+        <ul class="nav mb-3 border-bottom pb-2 flex-nowrap overflow-auto">
             <li class="nav-item">
-                <a class="nav-link text-dark fw-semibold ps-0" routerLink="/products/novedades">Novedades</a>
+                <a class="nav-link text-dark fw-semibold ps-0" routerLink="/products/novedades"
+                    routerLinkActive="fw-bold text-decoration-underline">
+                    Novedades
+                </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark fw-semibold" routerLink="/products/hombre">Hombre</a>
+                <a class="nav-link text-dark fw-semibold" routerLink="/products/hombre"
+                    routerLinkActive="fw-bold text-decoration-underline">
+                    Hombre
+                </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-dark fw-semibold" routerLink="/products/mujer">Mujer</a>
+                <a class="nav-link text-dark fw-semibold" routerLink="/products/mujer"
+                    routerLinkActive="fw-bold text-decoration-underline">
+                    Mujer
+                </a>
             </li>
         </ul>
 
-        <!-- Pills de Marcas -->
         <div class="d-flex gap-2 overflow-auto pb-2 scroll-container">
-
-            <button class="btn brand-chip rounded-pill px-4" routerLink="/products/all" routerLinkActive="active"
-                [routerLinkActiveOptions]="{exact: true}">
+            <button class="btn brand-chip rounded-pill px-4 flex-shrink-0" routerLink="/products/all"
+                routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                 All
             </button>
-
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/adidas"
-                routerLinkActive="active">
-                <img src="assets/icons/Adidas_Negro.svg" alt="Logo" class="logo-img mb-2"
-                    style="height: 30px; width: 40px;">
-                Adidas
+            <button class="btn brand-chip rounded-pill px-3 gap-2 flex-shrink-0 d-flex align-items-center"
+                routerLink="/products/adidas" routerLinkActive="active">
+                <img src="assets/icons/Adidas_Negro.svg" alt="Adidas" style="height: 20px; width: auto;"> Adidas
             </button>
-
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/puma"
-                routerLinkActive="active">
-                <img src="assets/icons/Puma_Negro.svg" alt="Logo" class="logo-img mb-2"
-                    style="height: 30px; width: 40px;">
-                Puma
+            <button class="btn brand-chip rounded-pill px-3 gap-2 flex-shrink-0 d-flex align-items-center"
+                routerLink="/products/puma" routerLinkActive="active">
+                <img src="assets/icons/Puma_Negro.svg" alt="Puma" style="height: 25px; width: auto;"> Puma
             </button>
-
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/nike"
-                routerLinkActive="active">
-                <img src="assets/icons/Nike_Negro.svg" alt="Logo" class="logo-img mb-2"
-                    style="height: 30px; width: 50px;">
-                Nike
+            <button class="btn brand-chip rounded-pill px-3 gap-2 flex-shrink-0 d-flex align-items-center"
+                routerLink="/products/nike" routerLinkActive="active">
+                <img src="assets/icons/Nike_Negro.svg" alt="Nike" style="height: 18px; width: auto;"> Nike
             </button>
-
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/jordan"
-                routerLinkActive="active">
-                <img src="assets/icons/Jordan_Negro.svg" alt="Logo" class="logo-img mb-2"
-                    style="height: 35px; width: 40px;">
-                Jordan
+            <button class="btn brand-chip rounded-pill px-3 gap-2 flex-shrink-0 d-flex align-items-center"
+                routerLink="/products/jordan" routerLinkActive="active">
+                <img src="assets/icons/Jordan_Negro.svg" alt="Jordan" style="height: 28px; width: auto;"> Jordan
             </button>
-
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/new Balance"
-                routerLinkActive="active">
-                <img src="assets/icons/NBalance_Negro.svg" alt="Logo" class="logo-img mb-2"
-                    style="height: 30px; width: 50px;">
-                New Balance
+            <button class="btn brand-chip rounded-pill px-3 gap-2 flex-shrink-0 d-flex align-items-center"
+                routerLink="/products/new-balance" routerLinkActive="active">
+                <img src="assets/icons/NBalance_Negro.svg" alt="NB" style="height: 20px; width: auto;"> New Balance
             </button>
-            <button class="btn brand-chip rounded-pill px-3 gap-2" routerLink="/products/off-White"
-                routerLinkActive="active">
-                <img src="assets/icons/off.svg" alt="Logo" class="logo-img mb-2"
-                    style="height: 35px; width: 50px;">
-                Off-White
+            <button class="btn brand-chip rounded-pill px-3 gap-2 flex-shrink-0 d-flex align-items-center"
+                routerLink="/products/off-white" routerLinkActive="active">
+                <img src="assets/icons/off.svg" alt="Off-White" style="height: 25px; width: auto;"> Off-White
             </button>
         </div>
 

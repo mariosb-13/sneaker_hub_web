@@ -1,62 +1,119 @@
-# SneakerHubWeb
+# SneakerHub – Store
 
-### Enlace Render
-https://sneaker-hub-web.onrender.com
+## Descripción del Proyecto
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.19.
+**SneakerHub** es una aplicación web orientada a la exposición y venta de zapatillas de colección. Este repositorio corresponde a la primera fase del proyecto, centrada en la **maquetación y diseño de interfaces** mediante **Angular** y **Bootstrap 5**.
 
-## Development server
+El objetivo principal de esta fase es la implementación de al menos el **50 % de las vistas principales**, priorizando una experiencia de usuario clara, un diseño totalmente responsivo y una correcta organización del proyecto basada en componentes reutilizables.
 
-To start a local development server, run:
+La aplicación se encuentra desplegada y accesible públicamente en el siguiente enlace:
 
-```bash
-ng serve
-```
+**Demo en producción (Render):**
+[https://sneaker-hub-web.onrender.com](https://sneaker-hub-web.onrender.com)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Estructura del Proyecto
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+La aplicación sigue las buenas prácticas recomendadas por Angular, separando responsabilidades y organizando la interfaz en componentes bien definidos:
 
-```bash
-ng generate component component-name
-```
+* **Auth**
+  Gestión de autenticación, incluyendo:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+  * `Login`
+  * `Signin` (registro de usuarios)
 
-```bash
-ng generate --help
-```
+* **Sneaker**
+  Gestión del catálogo de productos:
 
-## Building
+  * `SneakerList`: galería dinámica de zapatillas
+  * `SneakerDetails`: vista detallada de cada modelo
+  * `SneakerResume`: componente reutilizable para mostrar información resumida de productos
 
-To build the project run:
+* **Core UI**
+  Componentes globales compartidos:
 
-```bash
-ng build
-```
+  * `Navbar`
+  * `Footer`
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+* **Home**
+  Página principal de aterrizaje con secciones destacadas.
 
-## Running unit tests
+* **Models**
+  Definición de interfaces y modelos de datos para garantizar consistencia y tipado fuerte.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+---
 
-```bash
-ng test
-```
+## Enrutamiento (Angular Router)
 
-## Running end-to-end tests
+Se ha implementado un sistema de rutas dinámicas utilizando **Angular Router**, permitiendo una navegación clara y escalable:
 
-For end-to-end (e2e) testing, run:
+* `/home` – Página principal
+* `/login` y `/signin` – Vistas de autenticación
+* `/products/:category` – Listado filtrado por categoría
+* `/product/:id` – Vista de detalles mediante parámetros dinámicos
 
-```bash
-ng e2e
-```
+El uso de parámetros en la URL permite una navegación semántica y facilita la escalabilidad futura del proyecto.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## Maquetación y Uso de Bootstrap 5
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+El diseño visual de la aplicación se ha desarrollado principalmente con **Bootstrap 5**, reduciendo al mínimo el uso de estilos personalizados:
+
+* **Sistema de rejilla**
+  Uso de `container`, `row` y `col` para una adaptación fluida a diferentes tamaños de pantalla.
+
+* **Componentes**
+  Implementación de `navbars` responsivas, `cards` para el catálogo de productos y formularios con clases utilitarias.
+
+* **Diseño responsivo**
+  Uso de breakpoints (`sm`, `md`, `lg`) para garantizar una experiencia consistente en dispositivos móviles, tablets y escritorio.
+
+### Uso de SCSS
+
+El uso de **SCSS** se limita a aquellos casos donde Bootstrap no cubre las necesidades de personalización:
+
+* Definición de variables de color corporativas.
+* Efectos hover personalizados en tarjetas de producto.
+* Ajustes específicos de layout no cubiertos por clases utilitarias estándar.
+
+---
+
+## Instalación y Ejecución en Local
+
+1. Clonar el repositorio:
+
+   ```bash
+   git clone [URL-del-repositorio]
+   ```
+2. Instalar dependencias:
+
+   ```bash
+   npm install
+   ```
+3. Ejecutar el servidor de desarrollo:
+
+   ```bash
+   ng serve
+   ```
+4. Acceder desde el navegador:
+
+   ```
+   http://localhost:4200
+   ```
+
+---
+
+## Dificultades Encontradas y Mejoras Futuras
+
+### Dificultades
+
+* Ajuste del diseño responsivo en la vista de detalle del producto, manteniendo una jerarquía visual clara en pantallas pequeñas.
+
+### Mejoras Futuras
+
+* Integración con una API real para la gestión de productos.
+* Implementación de servicios y gestión de estado para el carrito de compras.
+* Filtros avanzados por talla, precio y marca.
+* Autenticación completa y persistencia de sesión.

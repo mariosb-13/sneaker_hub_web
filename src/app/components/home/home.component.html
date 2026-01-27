@@ -1,42 +1,65 @@
-<div class="mx-5">
-  <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+<div class="container-fluid px-0 mb-4 d-block d-md-none">
+  <div class="position-relative text-white">
+    <img src="assets/images/banner_1.jpg" class="w-100 object-fit-cover hero-mobile-img" alt="Nuevos Lanzamientos">
+
+    <div class="position-absolute top-50 start-50 translate-middle text-center w-100 px-3">
+      <h2 class="fw-bold text-uppercase display-5">Nuevos Drops</h2>
+      <p class="mb-4 fs-5">La última colección de Jordan y Nike.</p>
+      <button class="btn btn-light rounded-pill px-5 py-2 fw-bold shadow" routerLink="/products/novedades">
+        Ver ahora
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-5 d-none d-md-block">
+
+  <div id="mainCarousel" class="carousel slide rounded-4 overflow-hidden shadow" data-bs-ride="carousel">
+
     <div class="carousel-indicators">
-      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true"
-        aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active"></button>
+      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
     </div>
 
     <div class="carousel-inner">
 
       <div class="carousel-item active">
-        <img src="assets/images/banner_1.jpg" class="d-block w-100 bg-secondary" alt="Nuevos Lanzamientos"
-          style="height: 600px; object-fit: cover; filter: brightness(0.8);">
-        <div class="carousel-caption d-none d-md-block text-start">
-          <h5 class="display-4 fw-bold">Nuevos Lanzamientos</h5>
-          <p class="fs-5">Descubre la última colección de Jordan y Nike.</p>
-          <button class="btn btn-light rounded-pill px-4 fw-bold mt-2" routerLink="/products/novedades">Ver
-            Ahora</button>
+        <img src="assets/images/banner_1.jpg" class="d-block w-100 object-fit-cover carousel-custom-img"
+          alt="Nuevos Lanzamientos">
+
+        <div class="carousel-caption carousel-caption-custom d-none d-md-block text-start ps-4">
+          <h5 class="fw-bold display-4">Nuevos Lanzamientos</h5>
+          <p class="fs-4">Descubre la última colección de Jordan y Nike.</p>
+          <button class="btn btn-light rounded-pill px-4 fw-bold mt-2 shadow" routerLink="/products/novedades">
+            Ver ahora
+          </button>
         </div>
       </div>
 
       <div class="carousel-item">
-        <img src="assets/images/banner_2.jpeg" class="d-block w-100 bg-secondary" alt="Colección Verano"
-          style="height: 600px; object-fit: cover; filter: brightness(0.8);">
-        <div class="carousel-caption d-none d-md-block text-start">
-          <h5 class="display-4 fw-bold">Estilo Urbano</h5>
-          <p class="fs-5">Las mejores siluetas para tu día a día.</p>
-          <button class="btn btn-light rounded-pill px-4 fw-bold mt-2" routerLink="/products/all">Comprar</button>
+        <img src="assets/images/banner_2.jpeg" class="d-block w-100 object-fit-cover carousel-custom-img"
+          alt="Estilo Urbano">
+
+        <div class="carousel-caption carousel-caption-custom d-none d-md-block text-start ps-4">
+          <h5 class="fw-bold display-4">Estilo Urbano</h5>
+          <p class="fs-4">Las mejores siluetas para tu día a día.</p>
+          <button class="btn btn-light rounded-pill px-4 fw-bold mt-2 shadow" routerLink="/products/all">
+            Comprar
+          </button>
         </div>
       </div>
 
       <div class="carousel-item">
-        <img src="assets/images/banner_3.jpg" class="d-block w-100 bg-secondary" alt="Ofertas Especiales"
-          style="height: 600px; object-fit: cover; filter: brightness(0.8);">
-        <div class="carousel-caption d-none d-md-block text-start">
-          <h5 class="display-4 fw-bold">Ofertas Exclusivas</h5>
-          <p class="fs-5">Hasta un 30% de descuento en modelos seleccionados.</p>
-          <button class="btn btn-light rounded-pill px-4 fw-bold mt-2" routerLink="/products/all">Ver Ofertas</button>
+        <img src="assets/images/banner_3.jpg" class="d-block w-100 object-fit-cover carousel-custom-img"
+          alt="Ofertas Exclusivas">
+
+        <div class="carousel-caption carousel-caption-custom d-none d-md-block text-start ps-4">
+          <h5 class="fw-bold display-4">Ofertas Exclusivas</h5>
+          <p class="fs-4">Hasta un 30% de descuento en modelos seleccionados.</p>
+          <button class="btn btn-light rounded-pill px-4 fw-bold mt-2 shadow" routerLink="/products/all">
+            Ver ofertas
+          </button>
         </div>
       </div>
 
@@ -50,45 +73,45 @@
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
+
   </div>
 </div>
-<div class="container py-5">
+
+<div class="container py-4">
   <div class="row g-4">
 
-    <div class="col-md-4">
-      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100">
-        <img src="assets/images/img_hombre.jpg" class="card-img" alt="Hombre"
-          style="height: 400px; object-fit: cover; opacity: 0.9;">
-        <div class="card-img-overlay d-flex align-items-end justify-content-center pb-4">
-          <button routerLink="/products/hombre"
-            class="btn btn-white bg-black text-white rounded-pill px-4 py-2 gap-2 shadow">
-            Comprar para hombre
+    <div class="col-12 col-md-4">
+      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100 group-hover">
+        <img src="assets/images/img_hombre.jpg" class="card-img object-fit-cover card-category-img" alt="Hombre">
+        
+        <div class="card-img-overlay gradient-overlay d-flex flex-column justify-content-end p-4">
+          <h3 class="fw-bold text-uppercase display-6 mb-3">Hombre</h3>
+          <button routerLink="/products/hombre" class="btn btn-light rounded-pill stretched-link fw-bold px-4 w-auto fit-content">
+            Ver Colección
           </button>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100">
-        <img src="assets/images/img_mujer.jpg" class="card-img" alt="Mujer"
-          style="height: 400px; object-fit: cover; opacity: 0.9;">
-        <div class="card-img-overlay d-flex align-items-end justify-content-center pb-4">
-          <button routerLink="/products/mujer"
-            class="btn btn-white bg-white text-black rounded-pill px-4 py-2 gap-2 shadow">
-            Comprar para mujer
+    <div class="col-12 col-md-4">
+      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100 group-hover">
+        <img src="assets/images/img_mujer.jpg" class="card-img object-fit-cover card-category-img" alt="Mujer">
+        <div class="card-img-overlay gradient-overlay d-flex flex-column justify-content-end p-4">
+          <h3 class="fw-bold text-uppercase display-6 mb-3">Mujer</h3>
+          <button routerLink="/products/mujer" class="btn btn-light rounded-pill stretched-link fw-bold px-4 w-auto fit-content">
+            Ver Colección
           </button>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100">
-        <img src="assets/images/img_sneakers.jpg" class="card-img" alt="Novedades"
-          style="height: 400px; object-fit: cover; opacity: 0.9;">
-        <div class="card-img-overlay d-flex align-items-end justify-content-center pb-4">
-          <button routerLink="/products/novedades"
-            class="btn btn-white bg-black text-white rounded-pill px-4 py-2 gap-2 shadow">
-            Ver novedades
+    <div class="col-12 col-md-4">
+      <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm h-100 group-hover">
+        <img src="assets/images/img_sneakers.jpg" class="card-img object-fit-cover card-category-img" alt="Novedades">
+        <div class="card-img-overlay gradient-overlay d-flex flex-column justify-content-end p-4">
+          <h3 class="fw-bold text-uppercase display-6 mb-3">Novedades</h3>
+          <button routerLink="/products/novedades" class="btn btn-light rounded-pill stretched-link fw-bold px-4 w-auto fit-content">
+            Lo más nuevo
           </button>
         </div>
       </div>
