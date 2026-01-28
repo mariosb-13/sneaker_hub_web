@@ -1,35 +1,33 @@
-/* Chips de marcas (Botones grises) */
+/* Chips de marcas */
 .brand-chip {
-    background-color: #f3f4f6;
-    color: #333;
-    border: none;
-    font-weight: 500;
-    white-space: nowrap; /* Evita que el texto se rompa en dos líneas */
-    display: flex;
-    align-items: center;
-    transition: all 0.2s;
+    background-color: var(--bs-gray-200); 
+    color: var(--bs-body-color);         
+    transition: all 0.2s ease-in-out;
+    
+    // Hover usando una variable un poco más oscura
+    &:hover {
+        background-color: var(--bs-gray-300);
+    }
+
+    // Estado activo
+    &.active {
+        background-color: var(--bs-dark) !important; 
+        color: var(--bs-white) !important;
+        
+        // Invertir color del logo
+        img {
+            filter: invert(1) brightness(200%);
+        }
+    }
 }
 
-.brand-chip:hover {
-    background-color: #e5e7eb;
-}
-
-/* Estilo cuando el chip está activo */
-.brand-chip.active {
-    background-color: #212529 !important; 
-    color: #ffffff !important;            
-}
-
-/* Invertir el color de la imagen (logo) cuando el padre está activo */
-.brand-chip.active img {
-    filter: invert(100%) brightness(200%);
-}
-
-/* Ocultar barra de scroll en los filtros si hay muchos */
-.scroll-container::-webkit-scrollbar {
-    height: 4px;
-}
-.scroll-container::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
+/* Scrollbar personalizado */
+.scroll-container {
+    &::-webkit-scrollbar {
+        height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--bs-gray-400); // Usamos variable gris de bootstrap
+        border-radius: 4px;
+    }
 }
