@@ -11,8 +11,8 @@
 
     // Estado activo
     &.active {
-        background-color: var(--bs-dark) !important; 
-        color: var(--bs-white) !important;
+        background-color: var(--bs-dark); 
+        color: var(--bs-white);
         
         // Invertir color del logo
         img {
