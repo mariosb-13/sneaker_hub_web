@@ -1,27 +1,6 @@
-/* Ajuste del tamaño del logo */
-.logo-img {
-    height: 45px;
-    width: auto;
-}
-
-/* Estilos del buscador para que parezca una sola cápsula */
-.search-icon-box {
-    color: #6c757d;
-    border-color: #dee2e6;
-}
-
-.search-input {
-    border-color: #dee2e6;
-}
-
-.search-input:focus {
-    background-color: #fff;
-    border-color: #dee2e6; 
-}
-
 /* Chips de marcas (Botones grises) */
 .brand-chip {
-    background-color: #f3f4f6; /* Gris muy clarito */
+    background-color: #f3f4f6;
     color: #333;
     border: none;
     font-weight: 500;
