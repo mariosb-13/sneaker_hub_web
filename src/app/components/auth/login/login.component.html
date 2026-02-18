@@ -2,11 +2,10 @@
 
   <div class="text-center mb-4 w-100 pt-4 pt-md-0">
     <div class="d-flex justify-content-center align-items-center gap-3">
-      <img src="assets/icons/Logo_Negro.svg"  routerLink="home" alt="SneakerHub Logo" style="height: 50px; object-fit: contain; cursor: pointer ">
+      <img src="assets/icons/Logo_Negro.svg" routerLink="/home" alt="SneakerHub Logo" style="height: 50px; object-fit: contain; cursor: pointer ">
       <h2 class="fw-bold m-0 text-dark">SneakerHub</h2>
     </div>
     <hr>
-
   </div>
 
   <div class="card border-0 shadow-sm p-4"
@@ -21,7 +20,7 @@
             <i class="bi bi-at fs-5"></i>
           </span>
           <input type="email" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Correo">
+            placeholder="Correo" name="correo" [(ngModel)]="correo">
         </div>
 
         <div class="input-group mb-2">
@@ -29,7 +28,7 @@
             <i class="bi bi-key fs-5"></i>
           </span>
           <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Contraseña">
+            placeholder="Contraseña" name="password" [(ngModel)]="password">
         </div>
 
         <div class="mb-4">
@@ -39,15 +38,14 @@
         </div>
 
         <div class="d-grid gap-2 mb-3">
-          <button class="btn rounded-pill py-2 text-white bg-black" type="button"
-            routerLink="/home">
+          <button class="btn rounded-pill py-2 text-white bg-black" type="button" (click)="iniciarSesion()">
             Iniciar Sesión
           </button>
         </div>
 
         <div class="d-grid gap-2 mb-4">
-          <button class="btn btn-danger rounded-pill py-2" type="button" routerLink="/home">
-            <i class="bi bi-google me-2"></i> Iniciar Sesión
+          <button class="btn btn-danger rounded-pill py-2" type="button" (click)="loginConGoogle()">
+            <i class="bi bi-google me-2"></i> Iniciar Sesión con Google
           </button>
         </div>
 

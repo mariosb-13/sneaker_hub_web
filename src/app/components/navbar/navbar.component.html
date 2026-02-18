@@ -24,9 +24,25 @@
                 <div class="dropdown">
                     <button class="btn p-0 fs-5 bi bi-person-fill border-0" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false"></button>
+
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" routerLink="/signin">Signin</a></li>
-                        <li><a class="dropdown-item" routerLink="/login">Login</a></li>
+                        <ng-container *ngIf="!(isLoggedIn$ | async)">
+                            <li><a class="dropdown-item" routerLink="/signin">Únete a nosotros</a></li>
+                            <li><a class="dropdown-item" routerLink="/login">Iniciar sesión</a></li>
+                        </ng-container>
+
+                        <ng-container *ngIf="isLoggedIn$ | async">
+                            <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <button class="dropdown-item text-danger fw-bold" (click)="logout()">
+                                    Cerrar sesión
+                                </button>
+                            </li>
+                        </ng-container>
                     </ul>
                 </div>
             </div>
@@ -48,40 +64,44 @@
         </ul>
 
         <div class="d-flex gap-2 overflow-auto pb-2 scroll-container">
-            
-            <button class="btn brand-chip rounded-pill px-4 flex-shrink-0 fw-medium text-nowrap border-0" 
-                routerLink="/products/all"
-                routerLinkActive="active" 
-                [routerLinkActiveOptions]="{ exact: true }">
+
+            <button class="btn brand-chip rounded-pill px-4 flex-shrink-0 fw-medium text-nowrap border-0"
+                routerLink="/products/all" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                 All
             </button>
 
-            <button class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
+            <button
+                class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
                 routerLink="/products/adidas" routerLinkActive="active">
                 <img src="assets/icons/Adidas_Negro.svg" alt="Adidas" style="height: 20px; width: auto;"> Adidas
             </button>
 
-            <button class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
+            <button
+                class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
                 routerLink="/products/puma" routerLinkActive="active">
                 <img src="assets/icons/Puma_Negro.svg" alt="Puma" style="height: 25px; width: auto;"> Puma
             </button>
 
-            <button class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
+            <button
+                class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
                 routerLink="/products/nike" routerLinkActive="active">
                 <img src="assets/icons/Nike_Negro.svg" alt="Nike" style="height: 18px; width: auto;"> Nike
             </button>
 
-            <button class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
+            <button
+                class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
                 routerLink="/products/jordan" routerLinkActive="active">
                 <img src="assets/icons/Jordan_Negro.svg" alt="Jordan" style="height: 28px; width: auto;"> Jordan
             </button>
 
-            <button class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
+            <button
+                class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
                 routerLink="/products/new-balance" routerLinkActive="active">
                 <img src="assets/icons/NBalance_Negro.svg" alt="NB" style="height: 20px; width: auto;"> New Balance
             </button>
 
-            <button class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
+            <button
+                class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
                 routerLink="/products/off-white" routerLinkActive="active">
                 <img src="assets/icons/off.svg" alt="Off-White" style="height: 25px; width: auto;"> Off-White
             </button>
