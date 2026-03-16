@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router'; 
+import { SneakerService } from '../../../services/sneaker.service';
+import { AuthService } from '../../../services/auth.service'; 
+import { Sneaker } from '../../../models/sneaker.model';
 
 @Component({
   selector: 'app-sneakersdetails',
@@ -10,115 +13,94 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   styleUrls: ['./sneakerdetails.component.scss']
 })
 export class SneakersdetailsComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private sneakerService = inject(SneakerService);
+  private authService = inject(AuthService);
+  
+  // Inyectamos el ID de la plataforma para saber si estamos en el Server o en el Browser
+  private platformId = inject(PLATFORM_ID); 
 
-  sneaker: any = null; 
-  selectedSize: number | null = null;
+  sneaker: Sneaker | null = null; 
+  selectedSize: string | null = null;
 
-  allSneakers = [
-    {
-      id: 1,
-      brand: 'Nike',
-      model: 'Dunk Low',
-      colorway: 'Off-White Lot 34',
-      price: 700,
-      image: 'assets/images/nike-off-white.png',
-      sizes: [38, 39, 40, 41, 42, 43, 44]
-    },
-    {
-      id: 2,
-      brand: 'Jordan',
-      model: 'Jumpman Jack TR',
-      colorway: 'Travis Scott Sail',
-      price: 450,
-      image: 'assets/images/travis-scott.png',
-      sizes: [40, 41, 42, 43]
-    },
-    {
-      id: 3,
-      brand: 'Nike',
-      model: 'SB Dunk Low',
-      colorway: 'Pro QS Neckface',
-      price: 280,
-      image: 'assets/images/neckface.png',
-      sizes: [36, 37, 38, 39, 40]
-    },
-    {
-      id: 4,
-      brand: 'Nike',
-      model: 'SB Dunk Low',
-      colorway: 'Powerpuff Girls Bubbles',
-      price: 390,
-      image: 'assets/images/powerpuff.png',
-      sizes: [35, 36, 37, 38]
-    },
-    {
-      id: 5,
-      brand: 'Adidas',
-      model: 'Forum Low',
-      colorway: 'Bad Bunny Pink Easter Egg',
-      price: 550,
-      image: 'assets/images/bad-bunny.png',
-      sizes: [39, 40, 41, 42, 43, 44]
-    },
-    {
-      id: 6,
-      brand: 'Jordan',
-      model: '1 Retro High OG',
-      colorway: 'Lost and Found',
-      price: 450,
-      image: 'assets/images/lost-found.jpg',
-      sizes: [40, 41, 42, 43, 44, 45]
-    },
-    {
-      id: 7,
-      brand: 'New Balance',
-      model: '550',
-      colorway: 'White Green',
-      price: 180,
-      image: 'assets/images/nb-green.jpg',
-      sizes: [37, 38, 39, 40, 41, 42]
-    },
-    {
-      id: 8,
-      brand: 'Jordan',
-      model: '4 Retro',
-      colorway: 'Military Black',
-      price: 420,
-      image: 'assets/images/military-black.jpg',
-      sizes: [39, 40, 41, 42, 43, 44, 45]
-    },
-    {
-      id: 9,
-      brand: 'Nike',
-      model: 'SB Dunk Low',
-      colorway: 'Jarritos',
-      price: 600,
-      image: 'assets/images/jarritos.jpg',
-      sizes: [38, 39, 40, 41, 42]
-    },
-    {
-      id: 10,
-      brand: 'Adidas',
-      model: 'Yeezy Slide',
-      colorway: 'Onyx',
-      price: 120,
-      image: 'assets/images/onyx.jpg',
-      sizes: [36, 37, 38, 39, 40, 41, 42]
-    }
-  ];
+  // --- Variables para el visor 360 ---
+  currentImageIndex: number = 0;
+  isDragging: boolean = false;
+  startX: number = 0;
 
-  constructor(private route: ActivatedRoute) {}
+  async ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.sneaker = await this.sneakerService.getSneakerById(id);
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.sneaker = this.allSneakers.find(item => item.id === id);
-
-    if (!this.sneaker) {
-      console.error('Zapatilla no encontrada');
+      // Precargar las 36 imágenes SOLO si estamos en el navegador
+      if (this.sneaker && this.sneaker.images360) {
+        if (isPlatformBrowser(this.platformId)) {
+          this.sneaker.images360.forEach(url => {
+            const img = new Image();
+            img.src = url;
+          });
+        }
+      }
     }
   }
 
-  selectSize(size: number) {
+  selectSize(size: string) {
     this.selectedSize = size;
+  }
+
+  comprarZapatilla() {
+    const usuario = this.authService.getCurrentUser(); 
+
+    if (usuario) {
+      alert(`¡Añadido al carrito, ${usuario.email}! (Lógica de carrito pendiente)`);
+    } else {
+      alert('¡Tienes que iniciar sesión para poder comprar!');
+      this.router.navigate(['/signin']); 
+    }
+  }
+
+  // --- Lógica del Visor 360 ---
+  onDragStart(event: MouseEvent | TouchEvent) {
+    this.isDragging = true;
+    this.startX = this.getClientX(event);
+  }
+
+  onDragMove(event: MouseEvent | TouchEvent) {
+    if (!this.isDragging || !this.sneaker?.images360 || this.sneaker.images360.length === 0) return;
+
+    // Evitar que la pantalla haga scroll al arrastrar en móviles
+    if (window.TouchEvent && event instanceof TouchEvent) {
+      event.preventDefault(); 
+    }
+
+    const currentX = this.getClientX(event);
+    const diff = currentX - this.startX;
+
+    // Bajamos la sensibilidad a 8 para que gire más fluido
+    if (Math.abs(diff) > 8) { 
+      if (diff > 0) {
+        // Arrastre hacia la derecha (gira a la izquierda)
+        this.currentImageIndex = (this.currentImageIndex - 1 + this.sneaker.images360.length) % this.sneaker.images360.length;
+      } else {
+        // Arrastre hacia la izquierda (gira a la derecha)
+        this.currentImageIndex = (this.currentImageIndex + 1) % this.sneaker.images360.length;
+      }
+      this.startX = currentX; // Actualizamos la posición inicial
+    }
+  }
+
+  onDragEnd() {
+    this.isDragging = false;
+  }
+
+  onSliderChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.currentImageIndex = parseInt(target.value, 10);
+  }
+
+  private getClientX(event: MouseEvent | TouchEvent): number {
+    return 'touches' in event ? event.touches[0].clientX : (event as MouseEvent).clientX;
   }
 }

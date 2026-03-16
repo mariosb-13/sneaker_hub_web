@@ -1,0 +1,21 @@
+.btn-group-sm > .btn, .btn-sm {
+    width: 45px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.form-range::-webkit-slider-thumb {
+  background: #000;
+}
+
+.form-check-input:checked {
+  background-color: #000;
+  border-color: #000;
+}

@@ -16,7 +16,7 @@ export class AuthService {
 
     // Esto cumple con tu entidad "Usuario Base" y "Cliente"
     const userRef = ref(this.db, `users/${user.uid}`);
-    
+
     return set(userRef, {
       nombre: nombre,
       telefono: telefono,
@@ -32,6 +32,10 @@ export class AuthService {
 
   loginWithGoogle() {
     return signInWithPopup(this.auth, new GoogleAuthProvider());
+  }
+
+  getCurrentUser() {
+    return this.auth.currentUser;
   }
 
   logout() {

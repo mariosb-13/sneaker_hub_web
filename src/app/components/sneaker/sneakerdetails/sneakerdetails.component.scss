@@ -1,18 +1,34 @@
-// Estilo base de los botones de talla
-.size-btn {
-    width: 50px;
-    height: 40px;      
-    background-color: #f8f9fa; // Fondo gris muy clarito (Bootstrap light)
-    border-color: #dee2e6;     // Borde sutil
-    transition: all 0.2s ease;
+.custom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: #e9ecef;
+  border-radius: 5px;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  cursor: grab;
 
-    &:hover {
-        border-color: #000; // Al pasar el mouse, borde negro
-    }
-}
+  &:hover {
+    opacity: 1;
+  }
 
-// Cuando el botón tiene la clase .bg-dark (seleccionado)
-.bg-dark {
-    background-color: #212529 !important;
-    border-color: #212529 !important;
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #212529; /* Negro oscuro Bootstrap */
+    cursor: grab;
+    border: 2px solid #ffffff; /* Borde blanco para que resalte */
+    box-shadow: 0 0 4px rgba(0,0,0,0.3);
+  }
+
+  &:active::-webkit-slider-thumb {
+    cursor: grabbing;
+    transform: scale(1.2);
+    transition: transform 0.1s;
+  }
 }

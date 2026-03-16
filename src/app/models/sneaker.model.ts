@@ -1,9 +1,12 @@
 export interface Sneaker {
-    id: number;
-    brand: string;
-    model: string;
-    colorway: string;
-    price: number;
-    image: string;
-    isNew?: boolean;
+  id?: string;
+  brand: string;
+  model: string;
+  gender: string;
+  name: string;
+  price: number;
+  sizes: string[];
+  isTrending: boolean;
+  imageUrl: string;
+  images360: string[];
 }

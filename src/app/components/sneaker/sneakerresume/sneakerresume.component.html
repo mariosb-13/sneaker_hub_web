@@ -3,23 +3,22 @@
      [routerLink]="['/product', sneaker.id]">
   
   <div class="card-img-top d-flex justify-content-center align-items-center p-4 bg-white rounded-top-3">
-    <img [src]="sneaker.image" 
-         [alt]="sneaker.model" 
+    <img [src]="sneaker.imageUrl" 
+         [alt]="sneaker.name" 
          class="img-fluid" 
          style="max-height: 200px; object-fit: contain;">
   </div>
 
   <div class="card-body pt-0 pb-4 px-4">
     <h6 class="card-title text-dark mb-1 font-weight-normal">
-      {{ sneaker.brand }} {{ sneaker.model }}
-    </h6>
+      {{ sneaker.brand }} {{ sneaker.name }} </h6>
 
     <p class="card-text fw-bold text-dark mb-1 fs-5">
       {{ sneaker.price }} €
     </p>
 
     <p class="card-text text-secondary small">
-      {{ sneaker.colorway }}
+      Original Collection
     </p>
   </div>
 </div>

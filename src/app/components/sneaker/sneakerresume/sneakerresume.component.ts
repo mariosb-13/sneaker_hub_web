@@ -10,7 +10,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './sneakerresume.component.scss'
 })
 export class SneakerresumeComponent {
-  // Definimos el Input para recibir los datos desde el padre
-  // El "!" indica que la variable se iniciará seguro antes de usarse
   @Input() sneaker!: Sneaker; 
 }

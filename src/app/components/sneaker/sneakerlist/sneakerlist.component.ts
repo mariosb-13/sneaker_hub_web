@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { SneakerresumeComponent } from '../sneakerresume/sneakerresume.component';
+import { SneakerService } from '../../../services/sneaker.service';
 import { Sneaker } from '../../../models/sneaker.model';
+import { SneakerresumeComponent } from '../sneakerresume/sneakerresume.component';
 
 @Component({
   selector: 'app-sneakerlist',
@@ -12,105 +13,91 @@ import { Sneaker } from '../../../models/sneaker.model';
   styleUrl: './sneakerlist.component.scss'
 })
 export class SneakerlistComponent implements OnInit {
-  
-  categoryTitle: string = 'Sneakers';
+  private sneakerService = inject(SneakerService);
+  private route = inject(ActivatedRoute);
 
-  sneakers: Sneaker[] = [
-    {
-      id: 1,
-      brand: 'Nike',
-      model: 'Dunk Low',
-      colorway: 'Off-White Lot 34',
-      price: 700,
-      image: 'assets/images/nike-off-white.png'
-    },
-    {
-      id: 2,
-      brand: 'Jordan',
-      model: 'Jumpman Jack TR',
-      colorway: 'Travis Scott Sail',
-      price: 450,
-      image: 'assets/images/travis-scott.png'
-    },
-    {
-      id: 3,
-      brand: 'Nike',
-      model: 'SB Dunk Low',
-      colorway: 'Pro QS Neckface',
-      price: 280,
-      image: 'assets/images/neckface.png'
-    },
-    {
-      id: 4,
-      brand: 'Nike',
-      model: 'SB Dunk Low',
-      colorway: 'Powerpuff Girls Bubbles',
-      price: 390,
-      image: 'assets/images/powerpuff.png'
-    },
-    {
-      id: 5,
-      brand: 'Adidas',
-      model: 'Forum Low',
-      colorway: 'Bad Bunny Pink Easter Egg',
-      price: 550,
-      image: 'assets/images/bad-bunny.png'
-    },
-    {
-      id: 6,
-      brand: 'Jordan',
-      model: '1 Retro High OG',
-      colorway: 'Lost and Found',
-      price: 450,
-      image: 'assets/images/lost-found.jpg'
-    },
-    {
-      id: 7,
-      brand: 'New Balance',
-      model: '550',
-      colorway: 'White Green',
-      price: 180,
-      image: 'assets/images/nb-green.jpg'
-    },
-    {
-      id: 8,
-      brand: 'Jordan',
-      model: '4 Retro',
-      colorway: 'Military Black',
-      price: 420,
-      image: 'assets/images/military-black.jpg'
-    },
-    {
-      id: 9,
-      brand: 'Nike',
-      model: 'SB Dunk Low',
-      colorway: 'Jarritos',
-      price: 600,
-      image: 'assets/images/jarritos.jpg'
-    },
-    {
-      id: 10,
-      brand: 'Adidas',
-      model: 'Yeezy Slide',
-      colorway: 'Onyx',
-      price: 120,
-      image: 'assets/images/onyx.jpg'
-    }
-  ];
+  allSneakers: Sneaker[] = []; 
+  sneakers: Sneaker[] = [];    
+  categoryTitle: string = '';
 
-  constructor(private route: ActivatedRoute) {}
+  availableModels: string[] = [];
+  selectedModels: string[] = [];
+  selectedSizes: string[] = [];
+  currentMaxPrice: number = 1000;
+  currentSort: string = 'featured';
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const category = params.get('category');
-      if (category) {
-        if(category === 'all') this.categoryTitle = 'Todos los Sneakers';
-        else this.categoryTitle = `Sneakers de ${this.capitalize(category)}`;
-      }
+    this.route.params.subscribe(params => {
+      const cat = params['category']?.toLowerCase();
+      this.updateTitle(cat);
+      this.loadSneakers(cat);
     });
   }
 
-  private capitalize(s: string): string {
-    return s.charAt(0).toUpperCase() + s.slice(1);
+  updateTitle(cat: string | undefined) {
+    if (!cat || cat === 'all') this.categoryTitle = 'Catálogo Completo';
+    else if (cat === 'hombre') this.categoryTitle = 'Hombre';
+    else if (cat === 'mujer') this.categoryTitle = 'Mujer';
+    else this.categoryTitle = cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
+  }
+
+  loadSneakers(category: string | undefined) {
+    this.sneakerService.getSneakers().subscribe(list => {
+      // Filtrado por URL
+      if (!category || category === 'all') {
+        this.allSneakers = list;
+      } else if (category === 'hombre') {
+        this.allSneakers = list.filter(s => s.gender === 'Man');
+      } else if (category === 'mujer') {
+        this.allSneakers = list.filter(s => s.gender === 'Woman');
+      } else {
+        this.allSneakers = list.filter(s => s.brand.toLowerCase().replace(/\s+/g, '-') === category);
+      }
+
+      // Modelos disponibles en esta categoría
+      const models = this.allSneakers.map(s => s.model).filter(Boolean);
+      this.availableModels = [...new Set(models)].sort();
+
+      this.applyFilters();
+    });
+  }
+
+  // Métodos de filtros
+  toggleModel(model: string, event: Event) {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    if (isChecked) this.selectedModels.push(model);
+    else this.selectedModels = this.selectedModels.filter(m => m !== model);
+    this.applyFilters();
+  }
+
+  toggleSize(size: string) {
+    if (this.selectedSizes.includes(size)) this.selectedSizes = this.selectedSizes.filter(s => s !== size);
+    else this.selectedSizes.push(size);
+    this.applyFilters();
+  }
+
+  updatePrice(event: Event) {
+    this.currentMaxPrice = parseInt((event.target as HTMLInputElement).value, 10);
+    this.applyFilters();
+  }
+
+  onSortChange(event: Event) {
+    this.currentSort = (event.target as HTMLSelectElement).value;
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    let filtered = this.allSneakers.filter(s => {
+      const matchModel = this.selectedModels.length === 0 || this.selectedModels.includes(s.model);
+      const matchSize = this.selectedSizes.length === 0 || this.selectedSizes.some(sz => s.sizes.includes(sz));
+      const matchPrice = s.price <= this.currentMaxPrice;
+      return matchModel && matchSize && matchPrice;
+    });
+
+    if (this.currentSort === 'priceAsc') filtered.sort((a, b) => a.price - b.price);
+    else if (this.currentSort === 'priceDesc') filtered.sort((a, b) => b.price - a.price);
+    else if (this.currentSort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+    this.sneakers = filtered;
   }
 }
