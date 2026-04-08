@@ -1,0 +1,85 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold text-dark m-0">Gestión de Usuarios</h2>
+  <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
+    Total: {{ filteredUsers.length }}
+  </span>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="input-group shadow-sm rounded-pill overflow-hidden">
+      <span class="input-group-text bg-white border-0 ps-4">
+        <i class="bi bi-search text-muted"></i>
+      </span>
+      <input type="text" class="form-control border-0 bg-white py-2 shadow-none" 
+             placeholder="Buscar por nombre o email..." 
+             [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()">
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <select class="form-select border-0 shadow-sm rounded-pill py-2 px-4 cursor-pointer" 
+            [(ngModel)]="roleFilter" (ngModelChange)="applyFilters()">
+      <option value="todos">Todos los roles</option>
+      <option value="admin">Administradores</option>
+      <option value="cliente">Clientes</option>
+    </select>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 text-nowrap">
+      <thead class="table-light">
+        <tr>
+          <th class="ps-4 py-3" style="cursor: pointer;" (click)="sortBy('fullName')">
+            Usuario 
+            <i class="bi ms-1 text-muted" [ngClass]="{'bi-arrow-down-short text-dark': sortColumn === 'fullName' && sortDirection === 'desc', 'bi-arrow-up-short text-dark': sortColumn === 'fullName' && sortDirection === 'asc', 'bi-arrow-down-up': sortColumn !== 'fullName'}"></i>
+          </th>
+          <th class="py-3" style="cursor: pointer;" (click)="sortBy('email')">
+            Email
+            <i class="bi ms-1 text-muted" [ngClass]="{'bi-arrow-down-short text-dark': sortColumn === 'email' && sortDirection === 'desc', 'bi-arrow-up-short text-dark': sortColumn === 'email' && sortDirection === 'asc', 'bi-arrow-down-up': sortColumn !== 'email'}"></i>
+          </th>
+          <th class="py-3 text-center" style="cursor: pointer;" (click)="sortBy('rol')">
+            Rol Actual
+            <i class="bi ms-1 text-muted" [ngClass]="{'bi-arrow-down-short text-dark': sortColumn === 'rol' && sortDirection === 'desc', 'bi-arrow-up-short text-dark': sortColumn === 'rol' && sortDirection === 'asc', 'bi-arrow-down-up': sortColumn !== 'rol'}"></i>
+          </th>
+          <th class="py-3 text-end pe-4">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="4" class="text-center py-5 text-muted">
+            <i class="bi bi-search fs-1 mb-2 d-block opacity-50"></i>
+            No se encontraron usuarios con esos filtros.
+          </td>
+        </tr>
+        
+        <tr *ngFor="let user of filteredUsers">
+          <td class="ps-4">
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 40px; height: 40px;">
+                {{ user.fullName.charAt(0) | uppercase }}
+              </div>
+              <span class="fw-bold">{{ user.fullName }}</span>
+            </div>
+          </td>
+          <td class="text-secondary">{{ user.email }}</td>
+          <td class="text-center">
+            <span class="badge rounded-pill px-3 py-2" 
+                  [ngClass]="user.rol === 'admin' ? 'bg-primary' : 'bg-secondary bg-opacity-10 text-secondary border'">
+              {{ user.rol | uppercase }}
+            </span>
+          </td>
+          <td class="text-end pe-4">
+            <button class="btn btn-sm px-3 rounded-pill" 
+                    [ngClass]="user.rol === 'admin' ? 'btn-outline-danger' : 'btn-dark'"
+                    (click)="cambiarRol(user.uid, user.rol === 'admin' ? 'cliente' : 'admin')">
+              {{ user.rol === 'admin' ? 'Quitar Admin' : 'Hacer Admin' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

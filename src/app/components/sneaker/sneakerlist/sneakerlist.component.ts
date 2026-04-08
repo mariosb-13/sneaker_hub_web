@@ -89,7 +89,17 @@ export class SneakerlistComponent implements OnInit {
   applyFilters() {
     let filtered = this.allSneakers.filter(s => {
       const matchModel = this.selectedModels.length === 0 || this.selectedModels.includes(s.model);
-      const matchSize = this.selectedSizes.length === 0 || this.selectedSizes.some(sz => s.sizes.includes(sz));
+      
+      const matchSize = this.selectedSizes.length === 0 || this.selectedSizes.some(sz => {
+        if (!s.sizes) return false; // Si no tiene tallas, descartada
+        
+        // Convertimos el punto a guion bajo por si escogen "42.5"
+        const sizeKey = sz.replace('.', '_'); 
+        
+        // Comprobamos que esa talla exista en la base de datos Y tenga un stock mayor que 0
+        return s.sizes[sizeKey] !== undefined && s.sizes[sizeKey] > 0;
+      });
+
       const matchPrice = s.price <= this.currentMaxPrice;
       return matchModel && matchSize && matchPrice;
     });

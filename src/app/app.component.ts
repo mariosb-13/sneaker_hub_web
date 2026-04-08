@@ -21,7 +21,7 @@ export class AppComponent {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       // Si la URL es login o signin, ocultamos el layout (nav y footer)
-      const hiddenRoutes = ['/login', '/signin'];
+      const hiddenRoutes = ['/login', '/signin', '/admin'];
       // Verificamos si la URL actual incluye alguna de las rutas ocultas
       const currentUrl = event.urlAfterRedirects;
       

@@ -1,0 +1,15 @@
+/* Pequeño retoque para que las iniciales del avatar salgan centradas */
+.rounded-circle {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Evitar que el fondo de la tabla sea transparente */
+.table {
+  background-color: white;
+}
+
+/* Transición suave para los botones */
+.btn {
+  transition: all 0.2s ease-in-out;
+}

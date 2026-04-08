@@ -1,6 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Database, ref, onValue, get, child } from '@angular/fire/database';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Sneaker } from '../models/sneaker.model';
 
 @Injectable({
@@ -8,8 +9,13 @@ import { Sneaker } from '../models/sneaker.model';
 })
 export class SneakerService {
   private db = inject(Database);
+  private platformId = inject(PLATFORM_ID);
 
   getSneakers(): Observable<Sneaker[]> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return of([]); 
+    }
+
     const sneakersRef = ref(this.db, 'sneakers');
     
     return new Observable(observer => {
@@ -27,14 +33,16 @@ export class SneakerService {
     });
   }
 
-  
-// ... dentro de la clase SneakerService
-async getSneakerById(id: string): Promise<Sneaker | null> {
-  const dbRef = ref(this.db);
-  const snapshot = await get(child(dbRef, `sneakers/${id}`));
-  if (snapshot.exists()) {
-    return { id, ...snapshot.val() } as Sneaker;
+  async getSneakerById(id: string): Promise<Sneaker | null> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
+    }
+
+    const dbRef = ref(this.db);
+    const snapshot = await get(child(dbRef, `sneakers/${id}`));
+    if (snapshot.exists()) {
+      return { id, ...snapshot.val() } as Sneaker;
+    }
+    return null;
   }
-  return null;
-}
 }

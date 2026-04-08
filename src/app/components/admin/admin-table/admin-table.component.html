@@ -1,0 +1,65 @@
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="input-group shadow-sm rounded-pill overflow-hidden">
+      <span class="input-group-text bg-white border-0 ps-4"><i class="bi bi-search text-muted"></i></span>
+      <input type="text" class="form-control border-0 bg-white py-2 shadow-none" 
+             [placeholder]="searchPlaceholder" 
+             [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()">
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 text-nowrap">
+      <thead class="table-light">
+        <tr>
+          <th *ngFor="let col of columns" class="py-3 px-4" style="cursor: pointer;" (click)="sortBy(col.field)">
+            {{ col.header }}
+            <i class="bi ms-1 text-muted" 
+               [ngClass]="{'bi-arrow-down-short text-dark': sortColumn === col.field && sortDirection === 'desc', 
+                           'bi-arrow-up-short text-dark': sortColumn === col.field && sortDirection === 'asc', 
+                           'bi-arrow-down-up': sortColumn !== col.field}"></i>
+          </th>
+          <th class="py-3 text-end pe-4">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredData.length === 0">
+          <td [attr.colspan]="columns.length + 1" class="text-center py-5 text-muted">No hay datos.</td>
+        </tr>
+        
+        <tr *ngFor="let row of filteredData">
+          <td *ngFor="let col of columns" class="px-4">
+            
+            <span *ngIf="!col.type || col.type === 'text'">{{ row[col.field] }}</span>
+            
+            <div *ngIf="col.type === 'avatar'" class="d-flex align-items-center">
+              <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 35px; height: 35px;">
+                {{ row[col.field]?.charAt(0) | uppercase }}
+              </div>
+              <span class="fw-bold">{{ row[col.field] }}</span>
+            </div>
+
+            <span *ngIf="col.type === 'badge'" class="badge rounded-pill px-3 py-2" 
+                  [ngClass]="row[col.field] === 'admin' || row[col.field] === 'completado' ? 'bg-primary' : 'bg-secondary bg-opacity-10 text-secondary border'">
+              {{ row[col.field] | uppercase }}
+            </span>
+            
+            <span *ngIf="col.type === 'price'" class="fw-bold">{{ row[col.field] }} €</span>
+
+          </td>
+          
+          <td class="text-end pe-4">
+             <button class="btn btn-sm btn-outline-dark rounded-pill px-3 me-2" (click)="triggerAction('edit', row)">
+               <i class="bi bi-pencil"></i>
+             </button>
+             <button class="btn btn-sm btn-dark rounded-pill px-3" (click)="triggerAction('toggleRole', row)" *ngIf="row['rol']">
+               Cambiar Rol
+             </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

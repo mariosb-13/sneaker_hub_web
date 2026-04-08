@@ -5,7 +5,7 @@ export interface Sneaker {
   gender: string;
   name: string;
   price: number;
-  sizes: string[];
+  sizes: { [key: string]: number }; 
   isTrending: boolean;
   imageUrl: string;
   images360: string[];
