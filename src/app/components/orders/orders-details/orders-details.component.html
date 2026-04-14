@@ -1,0 +1,84 @@
+<div class="container py-5 mt-5" style="min-height: 70vh;">
+  
+  <button class="btn btn-outline-dark mb-4 rounded-pill px-4 shadow-sm" routerLink="/mis-pedidos">
+    <i class="bi bi-arrow-left me-2"></i> Volver a mis pedidos
+  </button>
+
+  <div *ngIf="cargando" class="text-center py-5">
+    <div class="spinner-border text-dark" role="status"></div>
+  </div>
+
+  <div *ngIf="!cargando && !pedido" class="text-center py-5 bg-light rounded-4 border">
+    <i class="bi bi-exclamation-circle text-muted display-4"></i>
+    <h3 class="text-muted mt-3">No se pudo encontrar la información del pedido</h3>
+  </div>
+
+  <div *ngIf="!cargando && pedido" class="row g-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-dark text-white p-4">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <h4 class="mb-0 fw-bold">Detalles del Pedido</h4>
+            <span class="badge bg-success py-2 px-3">{{ pedido.status }}</span>
+          </div>
+          <p class="mb-0 text-white-50 small">ID: {{ pedido.order_id }}</p>
+        </div>
+        
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item p-4 d-flex align-items-center" *ngFor="let item of pedido.purchased_sneakers">
+              <img [src]="item.imagen_snap" alt="Sneaker" class="rounded me-4 border bg-light" style="width: 90px; height: 90px; object-fit: contain;">
+              <div class="flex-grow-1">
+                <h5 class="fw-bold mb-1">{{ item.name_snap }}</h5>
+                <p class="text-muted mb-0">Talla: {{ item.talla_elegida }} | Cantidad: {{ item.cantidad_comprada }}</p>
+              </div>
+              <div class="text-end fw-bold fs-5">
+                {{ item.price_snap * item.cantidad_comprada | number:'1.2-2' }} €
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 mb-4 border-start border-4 border-dark">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">Resumen de Pago</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Subtotal</span>
+            <span>{{ pedido.total | number:'1.2-2' }} €</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
+            <span class="text-muted">Envío</span>
+            <span class="text-success fw-bold">Gratis</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-5 fw-bold">Total Pagado</span>
+            <span class="fs-3 fw-bold text-dark">{{ pedido.total | number:'1.2-2' }} €</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3 border-bottom pb-2">Dirección de Envío</h5>
+          <div class="d-flex align-items-start mb-2">
+            <i class="bi bi-geo-alt-fill text-danger me-2 mt-1"></i>
+            <div>
+              <p class="mb-0 fw-bold">{{ pedido.address }} {{ pedido.door }}</p>
+              <p class="mb-0 text-muted">{{ pedido.city }}, {{ pedido.zipCode }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 text-center bg-light">
+          <p class="text-muted small text-uppercase mb-2 fw-bold">Método de Pago</p>
+          <p class="mb-0 fw-bold fs-5"><i class="bi bi-credit-card me-2"></i>{{ pedido.paymentMethod }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

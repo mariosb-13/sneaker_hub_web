@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router'; 
 import { SneakerService } from '../../../services/sneaker.service';
 import { AuthService } from '../../../services/auth.service'; 
+import { CartService } from '../../../services/cart.service'; // Inyectamos el cerebro del carrito
 import { Sneaker } from '../../../models/sneaker.model';
 
 @Component({
@@ -17,6 +18,7 @@ export class SneakersdetailsComponent implements OnInit {
   private router = inject(Router);
   private sneakerService = inject(SneakerService);
   private authService = inject(AuthService);
+  private cartService = inject(CartService); 
   
   private platformId = inject(PLATFORM_ID); 
 
@@ -34,28 +36,26 @@ export class SneakersdetailsComponent implements OnInit {
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.sneaker = await this.sneakerService.getSneakerById(id);
+      if (isPlatformBrowser(this.platformId)) {
+        this.sneaker = await this.sneakerService.getSneakerById(id);
 
-      if (this.sneaker) {
-        // --- NUEVA LÓGICA: Procesar el objeto de tallas ---
-        if (this.sneaker.sizes) {
-          // 1. Obtenemos las claves (ej: ["38", "42_5", "44"])
-          this.availableSizes = Object.keys(this.sneaker.sizes)
-            // 2. Filtramos solo las que tienen stock mayor a 0
-            .filter(key => this.sneaker!.sizes[key] > 0)
-            // 3. Reemplazamos "_" por "." para que se lea "42.5"
-            .map(key => key.replace('_', '.'));
-            
-          // 4. (Opcional) Las ordenamos de menor a mayor
-          this.availableSizes.sort((a, b) => parseFloat(a) - parseFloat(b));
-        }
+        if (this.sneaker) {
+          // Procesar el objeto de tallas para filtrar las que no tienen stock
+          if (this.sneaker.sizes) {
+            this.availableSizes = Object.keys(this.sneaker.sizes)
+              .filter(key => this.sneaker!.sizes[key] > 0)
+              .map(key => key.replace('_', '.'));
+              
+            this.availableSizes.sort((a, b) => parseFloat(a) - parseFloat(b));
+          }
 
-        // Precargar las 36 imágenes
-        if (this.sneaker.images360 && isPlatformBrowser(this.platformId)) {
-          this.sneaker.images360.forEach(url => {
-            const img = new Image();
-            img.src = url;
-          });
+          // Precargar las 36 imágenes para el visor
+          if (this.sneaker.images360) {
+            this.sneaker.images360.forEach(url => {
+              const img = new Image();
+              img.src = url;
+            });
+          }
         }
       }
     }
@@ -69,7 +69,12 @@ export class SneakersdetailsComponent implements OnInit {
     const usuario = this.authService.getCurrentUser(); 
 
     if (usuario) {
-      alert(`¡Añadido al carrito, ${usuario.email}! (Lógica de carrito pendiente)`);
+      // Si hay usuario, zapatilla y talla, lo mandamos al carrito
+      if (this.sneaker && this.selectedSize) {
+        this.cartService.addToCart(this.sneaker, this.selectedSize);
+        // Te redirijo al carrito para que veas tu diseño en acción
+        this.router.navigate(['/carrito']);
+      }
     } else {
       alert('¡Tienes que iniciar sesión para poder comprar!');
       this.router.navigate(['/signin']); 

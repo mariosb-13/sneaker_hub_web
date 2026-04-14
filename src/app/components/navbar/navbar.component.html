@@ -20,7 +20,16 @@
             </form>
 
             <div class="d-flex align-items-center gap-2 gap-lg-3 flex-shrink-0 ms-0 ms-lg-3">
-                <a href="#" class="text-dark fs-5"><i class="bi bi-cart"></i></a>
+                
+                <a routerLink="/carrito" class="text-dark fs-5 position-relative">
+                    <i class="bi bi-cart"></i>
+                    <span *ngIf="(cartCount$ | async) !== 0" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          style="font-size: 0.55rem; padding: 0.35em 0.5em;">
+                        {{ cartCount$ | async }}
+                    </span>
+                </a>
+
                 <div class="dropdown">
                     <button class="btn p-0 fs-5 bi bi-person-fill border-0" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false"></button>
@@ -32,7 +41,6 @@
                         </ng-container>
 
                         <ng-container *ngIf="isLoggedIn$ | async">
-                            
                             <li *ngIf="isAdmin$ | async">
                                 <a class="dropdown-item fw-bold text-primary" routerLink="/admin">
                                     <i class="bi bi-gear-fill me-2"></i>Panel de Admin
@@ -40,7 +48,7 @@
                             </li>
 
                             <li><a class="dropdown-item" routerLink="/perfil">Mi Perfil</a></li>
-                            <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
+                            <li><a class="dropdown-item" routerLink="/mis-pedidos">Mis Pedidos</a></li>                            
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -71,7 +79,6 @@
         </ul>
 
         <div class="d-flex gap-2 overflow-auto pb-2 scroll-container">
-
             <button *ngFor="let brand of brands"
                 class="btn brand-chip rounded-pill px-3 gap-2 d-flex align-items-center fw-medium text-nowrap border-0"
                 [routerLink]="brand.route" 
@@ -86,7 +93,6 @@
                      
                 {{ brand.name }}
             </button>
-
         </div>
 
     </div>
