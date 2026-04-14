@@ -1,24 +1,22 @@
-<div class="card border-0 shadow-sm h-100 rounded-3" 
-     style="cursor: pointer;"
-     [routerLink]="['/product', sneaker.id]">
-  
-  <div class="card-img-top d-flex justify-content-center align-items-center p-4 bg-white rounded-top-3">
-    <img [src]="sneaker.imageUrl" 
-         [alt]="sneaker.name" 
-         class="img-fluid" 
-         style="max-height: 200px; object-fit: contain;">
+<div class="card border-0 shadow-sm h-100 rounded-4 d-flex flex-column overflow-hidden sneaker-card-hover"
+  [routerLink]="['/product', sneaker.id]">
+
+  <div class="card-img-top card-img-container d-flex justify-content-center align-items-center p-3 bg-white">
+    <img [src]="sneaker.imageUrl" [alt]="sneaker.name" class="img-fluid">
   </div>
 
-  <div class="card-body pt-0 pb-4 px-4">
-    <h6 class="card-title text-dark mb-1 font-weight-normal">
-      {{ sneaker.brand }} {{ sneaker.name }} </h6>
+  <div class="card-body pt-2 pb-4 px-4 d-flex flex-column flex-grow-1">
+    <h6 class="card-title text-dark mb-2 fw-normal text-start">
+      {{ sneaker.name }} </h6>
 
-    <p class="card-text fw-bold text-dark mb-1 fs-5">
-      {{ sneaker.price }} €
-    </p>
+    <div class="mt-auto">
+      <p class="card-text fw-bold text-dark mb-1 fs-5 text-start">
+        {{ sneaker.price | number:'1.2-2' }} €
+      </p>
 
-    <p class="card-text text-secondary small">
-      Original Collection
-    </p>
+      <p class="card-text text-secondary small fw-medium mb-0 text-start text-uppercase brand-text">
+        {{ sneaker.brand }}
+      </p>
+    </div>
   </div>
 </div>

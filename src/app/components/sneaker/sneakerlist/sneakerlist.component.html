@@ -1,58 +1,28 @@
 <div class="container my-5">
+  <div class="d-lg-none mb-3">
+    <button class="btn btn-dark w-100 d-flex align-items-center justify-content-center gap-2 rounded-3 py-2"
+      type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+      <i class="bi bi-sliders"></i> Filtrar y Ordenar
+    </button>
+  </div>
+
   <div class="row">
-    
-    <aside class="col-lg-3 mb-4">
-      <div class="card shadow-sm border-0">
+    <aside class="col-lg-3 d-none d-lg-block">
+      <div class="card shadow-sm border-0 rounded-4 p-2">
         <div class="card-body">
-          <h5 class="card-title fw-bold mb-4">Filtros</h5>
-
-          <div class="mb-4" *ngIf="availableModels.length > 0">
-            <h6 class="fw-bold border-bottom pb-2">Modelo</h6>
-            <div class="form-check" *ngFor="let model of availableModels">
-              <input class="form-check-input" type="checkbox" [id]="model" (change)="toggleModel(model, $event)">
-              <label class="form-check-label" [for]="model">
-                {{ model }}
-              </label>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <h6 class="fw-bold border-bottom pb-2">Talla</h6>
-            <div class="d-flex flex-wrap gap-2">
-              <button *ngFor="let size of ['38','39','40','41','42','43','44','45']" 
-                      type="button"
-                      class="btn btn-sm"
-                      [class.btn-dark]="selectedSizes.includes(size)"
-                      [class.btn-outline-secondary]="!selectedSizes.includes(size)"
-                      (click)="toggleSize(size)">
-                {{ size }}
-              </button>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <h6 class="fw-bold border-bottom pb-2">Precio Máximo</h6>
-            <div class="px-2">
-              <input type="range" class="form-range" min="0" max="1000" step="10" 
-                     [value]="currentMaxPrice" (input)="updatePrice($event)">
-              <div class="d-flex justify-content-between">
-                <span class="text-muted">0€</span>
-                <span class="fw-bold">{{ currentMaxPrice }}€</span>
-              </div>
-            </div>
-          </div>
+          <ng-container *ngTemplateOutlet="filterContent"></ng-container>
         </div>
       </div>
     </aside>
 
     <main class="col-lg-9">
-      
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <h2 class="h3 fw-bolder text-uppercase mb-0">{{ categoryTitle }}</h2>
-        
+
         <div class="d-flex align-items-center gap-2">
-          <label class="text-nowrap mb-0 text-muted">Ordenar por:</label>
-          <select class="form-select form-select-sm w-auto" (change)="onSortChange($event)">
+          <label class="text-nowrap mb-0 text-muted small fw-bold">ORDENAR POR:</label>
+          <select class="form-select form-select-sm border-0 bg-light rounded-pill px-3"
+            (change)="onSortChange($event)">
             <option value="featured">Destacados</option>
             <option value="priceAsc">Precio: Bajo a Alto</option>
             <option value="priceDesc">Precio: Alto a Bajo</option>
@@ -69,10 +39,71 @@
 
       <div class="text-center py-5" *ngIf="sneakers.length === 0">
         <i class="bi bi-search display-1 text-muted"></i>
-        <p class="mt-3 fs-5 text-muted">No se han encontrado resultados para tu búsqueda.</p>
-        <button class="btn btn-dark mt-2" (click)="loadSneakers(undefined)">Ver todo</button>
+        <p class="mt-3 fs-5 text-muted">No hay resultados para esta búsqueda.</p>
+        <button class="btn btn-dark mt-2 rounded-pill px-4" routerLink="/products/all">Ver todo</button>
       </div>
     </main>
-
   </div>
 </div>
+
+<div class="offcanvas offcanvas-start border-0 rounded-end-4" tabindex="-1" id="filterOffcanvas"
+  aria-labelledby="filterOffcanvasLabel">
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title fw-bold" id="filterOffcanvasLabel">Filtros</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ng-container *ngTemplateOutlet="filterContent"></ng-container>
+    <button class="btn btn-dark w-100 mt-4 rounded-pill py-2" data-bs-dismiss="offcanvas">Ver Resultados</button>
+  </div>
+</div>
+
+<ng-template #filterContent>
+
+  <div class="mb-4" *ngIf="currentCategory !== 'hombre' && currentCategory !== 'mujer'">
+    <h6 class="fw-bold text-uppercase small mb-3">Género</h6>
+    <div class="form-check mb-2">
+      <input class="form-check-input shadow-none" type="checkbox" id="g-man" (change)="toggleGender('Man', $event)">
+      <label class="form-check-label small text-muted" for="g-man">Hombre</label>
+    </div>
+    <div class="form-check mb-2">
+      <input class="form-check-input shadow-none" type="checkbox" id="g-woman" (change)="toggleGender('Woman', $event)">
+      <label class="form-check-label small text-muted" for="g-woman">Mujer</label>
+    </div>
+  </div>
+
+  <ng-container
+    *ngIf="currentCategory !== 'all' && currentCategory !== 'hombre' && currentCategory !== 'mujer' && currentCategory !== 'tendencias'">
+    <div class="mb-4" *ngIf="availableModels.length > 0">
+      <h6 class="fw-bold text-uppercase small mb-3">Modelo</h6>
+      <div style="max-height: 180px; overflow-y: auto;" class="pe-2 custom-scrollbar">
+        <div class="form-check mb-2" *ngFor="let model of availableModels">
+          <input class="form-check-input shadow-none" type="checkbox" [id]="'m-'+model"
+            (change)="toggleModel(model, $event)">
+          <label class="form-check-label small text-muted" [for]="'m-'+model">{{ model }}</label>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="mb-4">
+    <h6 class="fw-bold text-uppercase small mb-3">Talla</h6>
+    <div class="d-flex flex-wrap gap-2">
+      <button *ngFor="let size of ['38','39','40','41','42','43','44','45']" type="button"
+        class="btn btn-sm rounded-3 py-2 px-3 fw-medium" [class.btn-dark]="selectedSizes.includes(size)"
+        [class.btn-outline-secondary]="!selectedSizes.includes(size)" (click)="toggleSize(size)">
+        {{ size }}
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-2">
+    <h6 class="fw-bold text-uppercase small mb-3">Precio Máximo</h6>
+    <input type="range" class="form-range" min="0" max="1000" step="10" [value]="currentMaxPrice"
+      (input)="updatePrice($event)">
+    <div class="d-flex justify-content-between small fw-bold mt-2">
+      <span class="text-muted">0€</span>
+      <span class="text-dark">{{ currentMaxPrice }}€</span>
+    </div>
+  </div>
+</ng-template>

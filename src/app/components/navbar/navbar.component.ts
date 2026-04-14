@@ -38,7 +38,6 @@ export class NavbarComponent implements OnInit {
     })
   );
 
-  // CORRECCIÓN: Usamos 'cantidad' para que coincida con la interfaz CartItem de Android
   cartCount$: Observable<number> = this.cartService.getCart().pipe(
     map(items => items.reduce((acc, item) => acc + item.cantidad, 0))
   );
@@ -66,6 +65,13 @@ export class NavbarComponent implements OnInit {
         });
       }
     });
+  }
+
+  onSearch(term: string) {
+    if (term.trim()) {
+      // Redirige a 'all' pasándole el parámetro de búsqueda en la URL (?q=texto)
+      this.router.navigate(['/products/all'], { queryParams: { q: term.trim() } });
+    }
   }
 
   async logout() {

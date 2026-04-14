@@ -9,18 +9,18 @@
                 <span class="fw-bold ms-2 d-none d-sm-block fs-4">SneakerHub</span>
             </a>
 
-            <form class="d-flex flex-grow-1 mx-2 mx-lg-5 search-container" role="search" style="min-width: 100px;">
+            <form class="d-flex flex-grow-1 mx-2 mx-lg-5 search-container" role="search" style="min-width: 100px;" 
+                  (submit)="onSearch(searchInput.value); $event.preventDefault()">
                 <div class="input-group w-100">
                     <span class="input-group-text bg-white border-end-0 rounded-start-pill text-secondary px-2 px-lg-3">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input class="form-control border-start-0 rounded-end-pill shadow-none border-secondary-subtle px-2"
-                        type="search" placeholder="Buscar" aria-label="Buscar">
+                    <input #searchInput class="form-control border-start-0 rounded-end-pill shadow-none border-secondary-subtle px-2"
+                        type="search" placeholder="Buscar zapatillas..." aria-label="Buscar">
                 </div>
             </form>
 
             <div class="d-flex align-items-center gap-2 gap-lg-3 flex-shrink-0 ms-0 ms-lg-3">
-                
                 <a routerLink="/carrito" class="text-dark fs-5 position-relative">
                     <i class="bi bi-cart"></i>
                     <span *ngIf="(cartCount$ | async) !== 0" 
@@ -65,8 +65,8 @@
 
         <ul class="nav mb-3 border-bottom pb-2 flex-nowrap overflow-auto">
             <li class="nav-item">
-                <a class="nav-link text-dark fw-semibold ps-0" routerLink="/products/novedades"
-                    routerLinkActive="fw-bold text-decoration-underline">Novedades</a>
+                <a class="nav-link text-dark fw-semibold ps-0" routerLink="/products/tendencias"
+                    routerLinkActive="fw-bold text-decoration-underline">Tendencias</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-dark fw-semibold" routerLink="/products/hombre"

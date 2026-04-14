@@ -1,0 +1,22 @@
+.sneaker-card-hover {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .card-img-container {
+    height: 200px;
+    
+    img {
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .brand-text {
+    letter-spacing: 1px;
+  }
+}
