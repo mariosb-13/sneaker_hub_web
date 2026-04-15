@@ -20,6 +20,8 @@ import { AdminOrdersComponent } from './components/admin/admin-orders/admin-orde
 
 import { adminGuard } from './guards/admin.guard';
 import { successGuard } from './guards/success.guard';
+import { CancelComponent } from './components/cancel/cancel.component';
+import { cancelGuard } from './guards/cancel.guard';
 
 // Guardias de navegación de Firebase
 const redirectLoggedInToHome = () => redirectLoggedInTo(['/home']);
@@ -64,6 +66,12 @@ export const routes: Routes = [
       path: 'success', 
       component: SuccessComponent, 
       canActivate: [AuthGuard, successGuard], 
+      data: { authGuardPipe: redirectUnauthorizedToLogin } 
+    },
+    { 
+      path: 'cancel', 
+      component: CancelComponent, 
+      canActivate: [AuthGuard, cancelGuard], 
       data: { authGuardPipe: redirectUnauthorizedToLogin } 
     },
     { 
