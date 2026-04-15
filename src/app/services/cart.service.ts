@@ -54,12 +54,11 @@ export class CartService {
       const itemRef = ref(this.db, `cart/${user.uid}/${detalleCartId}/cantidad`);
       set(itemRef, existingItem.cantidad + 1);
     } else {
-      // 2. USAMOS EL MODELO CartItem EXACTO
       const newItem: CartItem = {
         detalleCartId: detalleCartId,
         productId: sneaker.id,
         name: sneaker.name,
-        brand: sneaker.brand, // Añadimos la marca si la quieres guardar
+        brand: sneaker.brand,
         price: sneaker.price,
         imageUrl: sneaker.imageUrl,
         tallaElegida: size,

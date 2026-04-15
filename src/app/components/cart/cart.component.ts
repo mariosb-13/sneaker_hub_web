@@ -4,8 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { CartItem } from '../../models/cartItem.model';
 import { PaymentService } from '../../services/payment.service';
-
-import { Database, ref, get } from '@angular/fire/database';
+import { Database, ref, get, update, push } from '@angular/fire/database';
 import { Auth } from '@angular/fire/auth';
 
 @Component({
@@ -33,7 +32,6 @@ export class CartComponent implements OnInit {
   showPaymentForm: boolean = false;
   clientSecret: string | null = null;
 
-  // --- VARIABLES PARA EL MODAL DE BOOTSTRAP ---
   mostrarModal: boolean = false;
   modalTitulo: string = '';
   modalMensaje: string = '';
@@ -45,17 +43,14 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // --- FUNCIÓN PARA ABRIR EL MODAL BONITO ---
   mostrarAlerta(titulo: string, mensaje: string) {
     this.modalTitulo = titulo;
     this.modalMensaje = mensaje;
     this.mostrarModal = true;
   }
 
-  // --- FUNCIÓN PARA CERRAR EL MODAL ---
   cerrarModal() {
     this.mostrarModal = false;
-    // Si el error era por la dirección, lo mandamos al perfil al cerrar el modal
     if (this.modalTitulo === 'Falta Dirección') {
       this.router.navigate(['/perfil']);
     }
@@ -68,7 +63,6 @@ export class CartComponent implements OnInit {
       return false;
     }
 
-    // 1. COMPROBAR DIRECCIÓN
     const userRef = ref(this.db, `users/${user.uid}`);
     const userSnap = await get(userRef);
     
@@ -76,13 +70,12 @@ export class CartComponent implements OnInit {
       const userData = userSnap.val();
       if (!userData.address || !userData.address.street || !userData.address.city || !userData.address.zipCode) {
         this.mostrarAlerta('Falta Dirección', 'No sabemos dónde enviarlo. Por favor, rellena tu dirección de envío antes de pagar.');
-        return false; // El redireccionamiento se hace ahora al cerrar el modal
+        return false; 
       }
     } else {
       return false;
     }
 
-    // 2. COMPROBAR STOCK
     for (let item of this.cartItems) {
       const tallaKey = item.tallaElegida.toString().replace('.', '_');
       const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
@@ -106,7 +99,6 @@ export class CartComponent implements OnInit {
     if (this.cartItems.length === 0) return;
     this.isProcessing = true;
 
-    // VALIDACIÓN 1: Al darle a "Pasar por caja"
     const compraValida = await this.validarCompra();
     
     if (!compraValida) {
@@ -138,15 +130,83 @@ export class CartComponent implements OnInit {
     }
   }
 
- async confirmarPago() {
+  async procesarCompraExitosa() {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    try {
+      const userRef = ref(this.db, `users/${user.uid}`);
+      const userSnap = await get(userRef);
+      const userData = userSnap.val();
+
+      const orderId = push(ref(this.db, 'orders')).key;
+
+      // Creamos el string formateado como lo tenías en tu JSON original
+      const itemsListFormatted = this.cartItems.map(item => `• ${item.name}`).join('\n');
+
+      const nuevoPedido = {
+        order_id: orderId,
+        order_date: Date.now(),
+        status: 'PAID',
+        total: this.total,
+        paymentMethod: 'Stripe (Tarjeta)',
+        address: userData.address.street,
+        city: userData.address.city,
+        zipCode: userData.address.zipCode,
+        door: userData.address.door || '',
+        itemsListFormatted: itemsListFormatted,
+        purchased_sneakers: this.cartItems.map(item => ({
+          id_producto_original: item.productId,
+          name_snap: item.name,
+          brand_snap: item.brand || '',
+          price_snap: item.price,
+          imagen_snap: item.imageUrl,
+          talla_elegida: item.tallaElegida.toString(),
+          cantidad_comprada: item.cantidad,
+          copia_id: Math.random().toString(36).substring(2, 15) 
+        }))
+      };
+
+      const updates: any = {};
+      
+      // Guardar el pedido
+      updates[`orders/${user.uid}/${orderId}`] = nuevoPedido;
+
+      // Descontar el stock
+      for (const item of this.cartItems) {
+        const tallaKey = item.tallaElegida.toString().replace('.', '_');
+        const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
+        const stockSnap = await get(stockRef);
+
+        if (stockSnap.exists()) {
+          const stockActual = stockSnap.val();
+          const nuevoStock = stockActual - item.cantidad;
+          updates[`sneakers/${item.productId}/sizes/${tallaKey}`] = nuevoStock;
+        }
+      }
+
+      // Ejecutar todo a la vez
+      await update(ref(this.db), updates);
+
+      // Limpiar carrito y redirigir
+      this.cartService.clearCart();
+      this.router.navigate(['/success'], { state: { orderSuccess: true } });
+
+    } catch (error) {
+      console.error("Error al procesar la compra en Firebase:", error);
+      this.mostrarAlerta("Error Interno", "El pago se ha realizado, pero hubo un error generando tu ticket. Por favor, contáctanos.");
+      this.isProcessing = false;
+    }
+  }
+
+  async confirmarPago() {
     if (!this.stripe || !this.elements) return;
     this.isProcessing = true;
 
-    // 👇 VALIDACIÓN 2: DOBLE CHECK ANTES DE COBRAR 👇
     const compraValida = await this.validarCompra();
     if (!compraValida) {
       this.isProcessing = false;
-      this.cancelarPago(); // Cerramos la tarjeta porque su carrito ya no es válido
+      this.cancelarPago(); 
       return; 
     }
 
@@ -159,10 +219,12 @@ export class CartComponent implements OnInit {
     });
 
     if (error) {
-      this.mostrarAlerta('Error en el pago', error.message);
+      this.mostrarAlerta('Error en el pago', error.message || 'Error al procesar la tarjeta');
       this.isProcessing = false;
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      this.router.navigate(['/success'], { state: { orderSuccess: true } });
+      
+      await this.procesarCompraExitosa();
+      
     }
   }
 
@@ -171,7 +233,6 @@ export class CartComponent implements OnInit {
     this.isProcessing = false;
   }
 
-  // 👇 BLOQUEO DE SEGURIDAD: SI TOCAN EL CARRITO, CERRAMOS EL PAGO 👇
   incrementQuantity(item: CartItem) {
     if (this.showPaymentForm) this.cancelarPago();
     this.cartService.updateQuantity(item.detalleCartId, item.cantidad + 1);
