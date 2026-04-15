@@ -5,6 +5,9 @@ import { CartService } from '../../services/cart.service';
 import { CartItem } from '../../models/cartItem.model';
 import { PaymentService } from '../../services/payment.service';
 
+import { Database, ref, get } from '@angular/fire/database';
+import { Auth } from '@angular/fire/auth';
+
 @Component({
   selector: 'app-cart',
   standalone: true,
@@ -16,6 +19,10 @@ export class CartComponent implements OnInit {
   private cartService = inject(CartService);
   private paymentService = inject(PaymentService);
   private router = inject(Router);
+  
+  // Inyectamos Auth y BD para hacer las comprobaciones previas
+  private db = inject(Database);
+  private auth = inject(Auth);
 
   cartItems: CartItem[] = [];
   total: number = 0;
@@ -35,10 +42,63 @@ export class CartComponent implements OnInit {
     });
   }
 
+  // --- EL PORTERO DE DISCOTECA (NUEVA FUNCIÓN) ---
+  async validarCompra(): Promise<boolean> {
+    const user = this.auth.currentUser;
+    if (!user) {
+      alert("Debes iniciar sesión para comprar.");
+      return false;
+    }
+
+    // 1. COMPROBAR DIRECCIÓN
+    const userRef = ref(this.db, `users/${user.uid}`);
+    const userSnap = await get(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.val();
+      // Verificamos que tenga los datos mínimos de envío (ajústalos si los llamas diferente)
+      if (!userData.address || !userData.city || !userData.zipCode) {
+        alert("¡Eh! No sabemos dónde enviarlo. Ve a tu Perfil y rellena tu dirección de envío antes de pagar.");
+        this.router.navigate(['/perfil']); // Lo mandamos al perfil a que lo rellene
+        return false;
+      }
+    } else {
+      return false;
+    }
+
+    // 2. COMPROBAR STOCK DE CADA ZAPATILLA
+    for (let item of this.cartItems) {
+      const tallaKey = item.tallaElegida.replace('.', '_');
+      const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
+      const stockSnap = await get(stockRef);
+      
+      let stockReal = 0;
+      if (stockSnap.exists()) {
+        stockReal = stockSnap.val();
+      }
+
+      // Si pide más de lo que hay, bloqueamos todo
+      if (stockReal < item.cantidad) {
+        alert(`❌ Error de stock: Solo nos quedan ${stockReal} unidades de "${item.name}" en talla ${item.tallaElegida}. Por favor, ajusta tu carrito.`);
+        return false;
+      }
+    }
+
+    return true; // Si pasa las dos pruebas, ¡le dejamos sacar la tarjeta!
+  }
+
   async checkout() {
     if (this.cartItems.length === 0) return;
     this.isProcessing = true;
 
+    const compraValida = await this.validarCompra();
+    
+    if (!compraValida) {
+      this.isProcessing = false;
+      return; // Si no es válida, cortamos el proceso aquí mismo
+    }
+
+    // Si todo está OK, seguimos con el proceso normal de Stripe
     this.clientSecret = await this.paymentService.obtenerClientSecret(this.cartItems, this.total);
 
     if (this.clientSecret) {
@@ -79,9 +139,7 @@ export class CartComponent implements OnInit {
       alert('Error: ' + error.message);
       this.isProcessing = false;
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      
       this.router.navigate(['/success'], { state: { orderSuccess: true } });
-      
     }
   }
 
