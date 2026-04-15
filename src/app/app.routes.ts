@@ -18,7 +18,10 @@ import { AdminUsersComponent } from './components/admin/admin-users/admin-users.
 import { AdminProductsComponent } from './components/admin/admin-products/admin-products.component';
 import { AdminOrdersComponent } from './components/admin/admin-orders/admin-orders.component';
 
-// Guardias de navegación
+import { adminGuard } from './guards/admin.guard';
+import { successGuard } from './guards/success.guard';
+
+// Guardias de navegación de Firebase
 const redirectLoggedInToHome = () => redirectLoggedInTo(['/home']);
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['/login']);
 
@@ -60,7 +63,7 @@ export const routes: Routes = [
     { 
       path: 'success', 
       component: SuccessComponent, 
-      canActivate: [AuthGuard], 
+      canActivate: [AuthGuard, successGuard], 
       data: { authGuardPipe: redirectUnauthorizedToLogin } 
     },
     { 
@@ -80,7 +83,7 @@ export const routes: Routes = [
     { 
       path: 'admin', 
       component: AdminComponent,
-      canActivate: [AuthGuard],
+      canActivate: [AuthGuard, adminGuard], 
       data: { authGuardPipe: redirectUnauthorizedToLogin },
       children: [
         { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

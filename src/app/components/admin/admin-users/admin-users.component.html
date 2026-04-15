@@ -1,85 +1,106 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h2 class="fw-bold text-dark m-0">Gestión de Usuarios</h2>
-  <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
-    Total: {{ filteredUsers.length }}
-  </span>
-</div>
-
-<div class="row g-3 mb-4">
-  <div class="col-md-6">
-    <div class="input-group shadow-sm rounded-pill overflow-hidden">
-      <span class="input-group-text bg-white border-0 ps-4">
-        <i class="bi bi-search text-muted"></i>
-      </span>
-      <input type="text" class="form-control border-0 bg-white py-2 shadow-none" 
-             placeholder="Buscar por nombre o email..." 
-             [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()">
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-dark m-0">Gestión de Usuarios</h2>
+      <p class="text-muted small">Controla los accesos y roles de tu comunidad</p>
     </div>
   </div>
-  
-  <div class="col-md-3">
-    <select class="form-select border-0 shadow-sm rounded-pill py-2 px-4 cursor-pointer" 
-            [(ngModel)]="roleFilter" (ngModelChange)="applyFilters()">
-      <option value="todos">Todos los roles</option>
-      <option value="admin">Administradores</option>
-      <option value="cliente">Clientes</option>
-    </select>
-  </div>
-</div>
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-  <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0 text-nowrap">
-      <thead class="table-light">
-        <tr>
-          <th class="ps-4 py-3" style="cursor: pointer;" (click)="sortBy('fullName')">
-            Usuario 
-            <i class="bi ms-1 text-muted" [ngClass]="{'bi-arrow-down-short text-dark': sortColumn === 'fullName' && sortDirection === 'desc', 'bi-arrow-up-short text-dark': sortColumn === 'fullName' && sortDirection === 'asc', 'bi-arrow-down-up': sortColumn !== 'fullName'}"></i>
-          </th>
-          <th class="py-3" style="cursor: pointer;" (click)="sortBy('email')">
-            Email
-            <i class="bi ms-1 text-muted" [ngClass]="{'bi-arrow-down-short text-dark': sortColumn === 'email' && sortDirection === 'desc', 'bi-arrow-up-short text-dark': sortColumn === 'email' && sortDirection === 'asc', 'bi-arrow-down-up': sortColumn !== 'email'}"></i>
-          </th>
-          <th class="py-3 text-center" style="cursor: pointer;" (click)="sortBy('rol')">
-            Rol Actual
-            <i class="bi ms-1 text-muted" [ngClass]="{'bi-arrow-down-short text-dark': sortColumn === 'rol' && sortDirection === 'desc', 'bi-arrow-up-short text-dark': sortColumn === 'rol' && sortDirection === 'asc', 'bi-arrow-down-up': sortColumn !== 'rol'}"></i>
-          </th>
-          <th class="py-3 text-end pe-4">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngIf="filteredUsers.length === 0">
-          <td colspan="4" class="text-center py-5 text-muted">
-            <i class="bi bi-search fs-1 mb-2 d-block opacity-50"></i>
-            No se encontraron usuarios con esos filtros.
-          </td>
-        </tr>
-        
-        <tr *ngFor="let user of filteredUsers">
-          <td class="ps-4">
-            <div class="d-flex align-items-center">
-              <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3 fw-bold" style="width: 40px; height: 40px;">
-                {{ user.fullName.charAt(0) | uppercase }}
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+      <div class="card card-modern p-3 bg-white d-flex flex-row align-items-center shadow-sm border-0 rounded-4">
+        <div class="bg-primary bg-opacity-10 p-3 rounded-4 me-3">
+          <i class="bi bi-people-fill text-primary fs-4"></i>
+        </div>
+        <div>
+          <h6 class="text-secondary small mb-1">Total Usuarios</h6>
+          <h3 class="fw-bold m-0">{{ totalUsers }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="card card-modern p-3 bg-white d-flex flex-row align-items-center shadow-sm border-0 rounded-4">
+        <div class="bg-warning bg-opacity-10 p-3 rounded-4 me-3">
+          <i class="bi bi-shield-lock-fill text-warning fs-4"></i>
+        </div>
+        <div>
+          <h6 class="text-secondary small mb-1">Administradores</h6>
+          <h3 class="fw-bold m-0">{{ totalAdmins }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+    <div class="card-header bg-white border-0 p-4">
+      <div class="input-group bg-light rounded-pill px-3">
+        <span class="input-group-text bg-transparent border-0 text-muted"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control bg-transparent border-0 shadow-none py-2" 
+               placeholder="Buscar por nombre o email..." [(ngModel)]="filtroBusqueda" (input)="aplicarFiltro()">
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4 py-3 border-0 text-secondary small fw-bold text-uppercase">Usuario</th>
+            <th class="border-0 text-secondary small fw-bold text-uppercase">Email / Teléfono</th>
+            <th class="border-0 text-secondary small fw-bold text-uppercase">Rol</th>
+            <th class="border-0 text-secondary small fw-bold text-uppercase">Registro</th>
+            <th class="text-end pe-4 border-0 text-secondary small fw-bold text-uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers" class="border-top">
+            <td class="ps-4 py-3">
+              <div class="d-flex align-items-center">
+                <img [src]="user.profileImageUrl || 'https://ui-avatars.com/api/?name=' + user.fullName + '&background=f8f9fa&color=212529'" 
+                     (error)="img.src='https://ui-avatars.com/api/?name=' + user.fullName + '&background=f8f9fa&color=212529'"
+                     #img
+                     class="rounded-circle border shadow-sm me-3" style="width: 45px; height: 45px; object-fit: cover;">
+                <div class="d-flex flex-column">
+                  <span class="fw-bold text-dark">{{ user.fullName }}</span>
+                  <small class="text-muted">UID: {{ user.uid.substring(0,8) }}...</small>
+                </div>
               </div>
-              <span class="fw-bold">{{ user.fullName }}</span>
-            </div>
-          </td>
-          <td class="text-secondary">{{ user.email }}</td>
-          <td class="text-center">
-            <span class="badge rounded-pill px-3 py-2" 
-                  [ngClass]="user.rol === 'admin' ? 'bg-primary' : 'bg-secondary bg-opacity-10 text-secondary border'">
-              {{ user.rol | uppercase }}
-            </span>
-          </td>
-          <td class="text-end pe-4">
-            <button class="btn btn-sm px-3 rounded-pill" 
-                    [ngClass]="user.rol === 'admin' ? 'btn-outline-danger' : 'btn-dark'"
-                    (click)="cambiarRol(user.uid, user.rol === 'admin' ? 'cliente' : 'admin')">
-              {{ user.rol === 'admin' ? 'Quitar Admin' : 'Hacer Admin' }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td>
+              <div class="d-flex flex-column">
+                <span class="small text-dark fw-semibold">{{ user.email }}</span>
+                <small class="text-muted">{{ user.phone || 'Sin teléfono' }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="badge rounded-pill px-3 py-2" 
+                    [ngClass]="user.rol === 'admin' ? 'bg-warning text-dark' : 'bg-light text-secondary border'">
+                {{ user.rol === 'admin' ? 'ADMIN' : 'USUARIO' }}
+              </span>
+            </td>
+            <td><small class="text-muted">{{ user.fechaReg | date:'dd/MM/yyyy' }}</small></td>
+            <td class="pe-4 text-end">
+              <div class="dropdown">
+                <button class="btn btn-light btn-sm rounded-circle shadow-none" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 py-2">
+                  <li>
+                    <button class="dropdown-item py-2" (click)="cambiarRol(user)">
+                      <i class="bi bi-arrow-left-right me-2 text-primary"></i> Cambiar Rol
+                    </button>
+                  </li>
+                  <li><hr class="dropdown-divider opacity-50"></li>
+                  <li>
+                    <button class="dropdown-item py-2 text-danger" (click)="eliminarUsuario(user.uid)">
+                      <i class="bi bi-person-x me-2"></i> Eliminar Cuenta
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

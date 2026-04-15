@@ -79,7 +79,9 @@ export class CartComponent implements OnInit {
       alert('Error: ' + error.message);
       this.isProcessing = false;
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      this.router.navigate(['/success']);
+      
+      this.router.navigate(['/success'], { state: { orderSuccess: true } });
+      
     }
   }
 

@@ -1,37 +1,198 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h2 class="fw-bold text-dark m-0">Pedidos Recientes</h2>
-  <span class="badge bg-danger px-3 py-2 rounded-pill shadow-sm">
-    0 Pendientes
+  <div>
+    <h2 class="fw-bold text-dark m-0">Pedidos Globales</h2>
+    <p class="text-muted small m-0">Monitorización de ventas en tiempo real</p>
+  </div>
+  <span class="badge px-4 py-2 rounded-pill shadow-sm" [ngClass]="pendientes > 0 ? 'bg-danger' : 'bg-success'">
+    <i class="bi" [ngClass]="pendientes > 0 ? 'bi-bell-fill' : 'bi-check-circle-fill'"></i>
+    {{ pendientes }} por Enviar
   </span>
 </div>
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+<div *ngIf="cargando" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status"></div>
+  <p class="text-muted mt-3 small fw-bold">Sincronizando ventas...</p>
+</div>
+
+<div *ngIf="!cargando && pedidos.length === 0" class="text-center py-5 bg-white rounded-4 border-dashed border-2 shadow-sm">
+  <i class="bi bi-receipt text-muted" style="font-size: 3rem;"></i>
+  <h5 class="text-muted mt-3 fw-bold">No hay pedidos registrados</h5>
+  <p class="text-muted small">Cuando los clientes compren en la app, aparecerán aquí automáticamente.</p>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" *ngIf="!cargando && pedidos.length > 0">
+  <div class="card-body p-3 bg-white">
+    <div class="row g-3 align-items-end">
+      
+      <div class="col-12 col-md-5">
+        <div class="input-group bg-light rounded-3 px-2">
+          <span class="input-group-text bg-transparent border-0 text-muted"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control bg-transparent border-0 shadow-none py-2" 
+                 placeholder="Buscar por ID, cliente o email..." [(ngModel)]="filtroTexto">
+        </div>
+      </div>
+      
+      <div class="col-8 col-md-5">
+        <label class="small fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.65rem; letter-spacing: 1px;">Estado del Pedido</label>
+        <select class="form-select border-0 bg-light shadow-none fw-semibold text-dark" [(ngModel)]="filtroEstado">
+          <option value="TODOS">Todos los pedidos</option>
+          <option value="PAID">🟡 Pagados (Por enviar)</option>
+          <option value="SHIPPED">🔵 Enviados (En tránsito)</option>
+          <option value="DELIVERED">🟢 Entregados</option>
+          <option value="CANCELLED">🔴 Cancelados</option>
+        </select>
+      </div>
+      
+      <div class="col-4 col-md-2 text-end">
+        <button class="btn btn-light w-100 rounded-3 text-secondary fw-bold" (click)="limpiarFiltros()">
+          <i class="bi bi-eraser me-1"></i> Limpiar
+        </button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!cargando && pedidos.length > 0" class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0 text-nowrap">
-      <thead class="table-light">
+      <thead class="bg-light">
         <tr>
-          <th class="ps-4 py-3">ID Pedido</th>
-          <th class="py-3">Cliente</th>
-          <th class="py-3">Fecha</th>
-          <th class="py-3">Total</th>
-          <th class="py-3 text-center">Estado</th>
-          <th class="py-3 text-end pe-4">Acciones</th>
+          <th class="ps-4 py-3 border-0 text-secondary small fw-bold text-uppercase">ID Pedido</th>
+          <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Cliente</th>
+          <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Fecha</th>
+          <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Total</th>
+          <th class="py-3 text-center border-0 text-secondary small fw-bold text-uppercase">Estado</th>
+          <th class="py-3 text-end pe-4 border-0 text-secondary small fw-bold text-uppercase">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td class="ps-4 fw-bold text-secondary">#ORD-9823</td>
-          <td>Mario Barros</td>
-          <td>23 Mar 2026</td>
-          <td class="fw-bold">250.00€</td>
+        
+        <tr *ngIf="pedidosFiltrados.length === 0">
+          <td colspan="6" class="text-center py-4 text-muted">
+            <i class="bi bi-search me-2"></i> No se encontraron pedidos con esos filtros.
+          </td>
+        </tr>
+
+        <tr *ngFor="let p of pedidosFiltrados" class="border-top">
+          <td class="ps-4 fw-bold text-secondary">
+            <i class="bi bi-box-seam text-primary me-2"></i>#{{ p.id.substring(1,8) | uppercase }}
+          </td>
+          <td>
+            <div class="d-flex flex-column">
+              <span class="fw-bold text-dark">{{ p.userName }}</span>
+              <small class="text-muted">{{ p.userEmail }}</small>
+            </div>
+          </td>
+          <td class="text-muted">
+            <i class="bi bi-calendar3 me-1"></i> {{ p.order_date | date:'dd/MMM/yyyy HH:mm' }}
+          </td>
+          <td class="fw-bold text-dark fs-6">{{ p.total || 0 | number:'1.2-2' }} €</td>
           <td class="text-center">
-            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Pendiente</span>
+            <span class="badge rounded-pill px-3 py-2 border" 
+                  [ngClass]="{
+                    'bg-warning text-dark border-warning': p.status === 'PAID',
+                    'bg-primary text-white border-primary': p.status === 'SHIPPED',
+                    'bg-success text-white border-success': p.status === 'DELIVERED',
+                    'bg-danger text-white border-danger': p.status === 'CANCELLED'
+                  }">
+              <i class="bi" 
+                 [ngClass]="{
+                   'bi-box-seam': p.status === 'PAID',
+                   'bi-truck': p.status === 'SHIPPED',
+                   'bi-check2-all': p.status === 'DELIVERED',
+                   'bi-x-circle': p.status === 'CANCELLED'
+                 }"></i> 
+              {{ p.status === 'PAID' ? 'Por enviar' : p.status }}
+            </span>
           </td>
           <td class="text-end pe-4">
-            <button class="btn btn-sm btn-outline-dark rounded-pill px-3">Ver Detalles</button>
+            <button class="btn btn-sm btn-dark rounded-pill px-3 shadow-sm" (click)="verDetalles(p)" data-bs-toggle="modal" data-bs-target="#orderDetailModal">
+              Ver Detalles
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg rounded-4 bg-light">
+      
+      <div class="modal-header border-0 pt-4 px-4 pb-2" *ngIf="selectedOrder">
+        <div>
+          <h4 class="modal-title fw-bold text-dark m-0">Detalle de Pedido</h4>
+          <span class="text-muted small">#{{ selectedOrder.id | uppercase }}</span>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body p-4 pt-3" *ngIf="selectedOrder">
+        
+        <div class="bg-white p-3 rounded-4 shadow-sm mb-4 border d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-uppercase fw-bold text-secondary d-block mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Comprador</small>
+            <h6 class="m-0 fw-bold fs-6">{{ selectedOrder.userName }}</h6>
+            <small class="text-muted">{{ selectedOrder.userEmail }}</small>
+          </div>
+          <div class="text-end">
+            <small class="text-uppercase fw-bold text-secondary d-block mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Total Abonado</small>
+            <h4 class="m-0 fw-bold text-primary">{{ selectedOrder.total || 0 | number:'1.2-2' }} €</h4>
+          </div>
+        </div>
+
+        <h6 class="fw-bold mb-3 small text-uppercase text-secondary" style="letter-spacing: 1px;">Artículos Comprados</h6>
+        
+        <div class="list-group list-group-flush rounded-4 border shadow-sm overflow-hidden">
+          <div class="list-group-item d-flex align-items-center py-3 bg-white" *ngFor="let item of selectedOrder.purchased_sneakers">
+            <div class="bg-light p-2 rounded-3 border me-3 d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+              <img [src]="item.imagen_snap" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-1 small fw-bold text-dark">{{ item.name_snap }}</h6>
+              <div class="d-flex gap-2">
+                <span class="badge bg-dark rounded-pill px-2 py-1">Talla {{ item.talla_elegida }}</span>
+                <span class="badge bg-secondary rounded-pill px-2 py-1">Cant: {{ item.cantidad_comprada }}</span>
+              </div>
+            </div>
+            <div class="text-end ms-3">
+              <span class="fw-bold text-dark d-block">{{ item.price_snap * item.cantidad_comprada | number:'1.2-2' }} €</span>
+              <small class="text-muted" *ngIf="item.cantidad_comprada > 1">{{ item.price_snap }} €/ud</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 bg-white p-3 rounded-4 shadow-sm border">
+          <h6 class="fw-bold mb-2 small text-uppercase text-secondary" style="letter-spacing: 1px;">Dirección de Envío</h6>
+          <p class="m-0 small text-dark">
+            <i class="bi bi-geo-alt-fill text-primary me-1"></i> 
+            {{ selectedOrder.address }}, {{ selectedOrder.door }}<br>
+            <span class="ms-3">{{ selectedOrder.zipCode }} - {{ selectedOrder.city }}</span>
+          </p>
+        </div>
+
+      </div>
+      
+     <div class="modal-footer border-0 pb-4 px-4 pt-0 justify-content-between" *ngIf="selectedOrder">
+        <button type="button" class="btn btn-light rounded-pill px-4 border shadow-sm" data-bs-dismiss="modal">Cerrar</button>
+        
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" 
+                  *ngIf="selectedOrder.status === 'PAID'" 
+                  (click)="actualizarEstado('SHIPPED')">
+            <i class="bi bi-truck me-2"></i> Marcar Enviado
+          </button>
+
+          <button type="button" class="btn btn-success rounded-pill px-4 shadow-sm fw-bold" 
+                  *ngIf="selectedOrder.status === 'SHIPPED'" 
+                  (click)="actualizarEstado('DELIVERED')">
+            <i class="bi bi-check2-all me-2"></i> Marcar Entregado
+          </button>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

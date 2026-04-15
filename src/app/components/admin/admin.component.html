@@ -1,10 +1,12 @@
-<div class="d-flex">
-  <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark position-fixed vh-100 shadow" style="width: 280px;">
+<div class="d-flex bg-light min-vh-100">
+  
+  <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark position-fixed vh-100 shadow" style="width: 280px; z-index: 1000;">
+    
     <a routerLink="/admin/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none px-2">
       <img src="assets/icons/Logo_Negro.svg" alt="Logo" class="me-2" style="height: 30px; filter: brightness(0) invert(1);">
       <span class="fs-4 fw-bold">AdminHub</span>
     </a>
-    <hr>
+    <hr class="border-secondary">
     
     <ul class="nav nav-pills flex-column mb-auto">
       <li class="nav-item">
@@ -29,15 +31,19 @@
       </li>
     </ul>
     
-    <hr>
-    <div class="px-2">
-      <button routerLink="/home" class="btn btn-outline-light w-100 rounded-pill btn-sm">
+    <hr class="border-secondary">
+    
+    <div class="px-2 pb-3">
+      <button routerLink="/home" class="btn btn-outline-light w-100 rounded-pill btn-sm py-2">
         <i class="bi bi-arrow-left me-2"></i> Volver a la Tienda
       </button>
     </div>
   </div>
 
-  <div class="flex-grow-1 bg-light min-vh-100" style="margin-left: 280px; padding: 3rem;">
-    <router-outlet></router-outlet>
+  <div class="flex-grow-1 p-4 p-md-5" style="margin-left: 280px;">
+    <div class="container-fluid p-0" style="max-width: 1400px; margin: 0 auto;">
+      <router-outlet></router-outlet>
+    </div>
   </div>
+
 </div>
