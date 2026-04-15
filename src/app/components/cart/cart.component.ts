@@ -4,7 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { CartItem } from '../../models/cartItem.model';
 import { PaymentService } from '../../services/payment.service';
-import { Database, ref, get, update, push } from '@angular/fire/database';
+import { Database, ref, get, update, push, runTransaction } from '@angular/fire/database';
 import { Auth } from '@angular/fire/auth';
 
 @Component({
@@ -100,7 +100,6 @@ export class CartComponent implements OnInit {
     this.isProcessing = true;
 
     const compraValida = await this.validarCompra();
-    
     if (!compraValida) {
       this.isProcessing = false;
       return; 
@@ -130,79 +129,11 @@ export class CartComponent implements OnInit {
     }
   }
 
-  async procesarCompraExitosa() {
-    const user = this.auth.currentUser;
-    if (!user) return;
-
-    try {
-      const userRef = ref(this.db, `users/${user.uid}`);
-      const userSnap = await get(userRef);
-      const userData = userSnap.val();
-
-      const orderId = push(ref(this.db, 'orders')).key;
-
-      // Creamos el string formateado como lo tenías en tu JSON original
-      const itemsListFormatted = this.cartItems.map(item => `• ${item.name}`).join('\n');
-
-      const nuevoPedido = {
-        order_id: orderId,
-        order_date: Date.now(),
-        status: 'PAID',
-        total: this.total,
-        paymentMethod: 'Stripe (Tarjeta)',
-        address: userData.address.street,
-        city: userData.address.city,
-        zipCode: userData.address.zipCode,
-        door: userData.address.door || '',
-        itemsListFormatted: itemsListFormatted,
-        purchased_sneakers: this.cartItems.map(item => ({
-          id_producto_original: item.productId,
-          name_snap: item.name,
-          brand_snap: item.brand || '',
-          price_snap: item.price,
-          imagen_snap: item.imageUrl,
-          talla_elegida: item.tallaElegida.toString(),
-          cantidad_comprada: item.cantidad,
-          copia_id: Math.random().toString(36).substring(2, 15) 
-        }))
-      };
-
-      const updates: any = {};
-      
-      // Guardar el pedido
-      updates[`orders/${user.uid}/${orderId}`] = nuevoPedido;
-
-      // Descontar el stock
-      for (const item of this.cartItems) {
-        const tallaKey = item.tallaElegida.toString().replace('.', '_');
-        const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
-        const stockSnap = await get(stockRef);
-
-        if (stockSnap.exists()) {
-          const stockActual = stockSnap.val();
-          const nuevoStock = stockActual - item.cantidad;
-          updates[`sneakers/${item.productId}/sizes/${tallaKey}`] = nuevoStock;
-        }
-      }
-
-      // Ejecutar todo a la vez
-      await update(ref(this.db), updates);
-
-      // Limpiar carrito y redirigir
-      this.cartService.clearCart();
-      this.router.navigate(['/success'], { state: { orderSuccess: true } });
-
-    } catch (error) {
-      console.error("Error al procesar la compra en Firebase:", error);
-      this.mostrarAlerta("Error Interno", "El pago se ha realizado, pero hubo un error generando tu ticket. Por favor, contáctanos.");
-      this.isProcessing = false;
-    }
-  }
-
   async confirmarPago() {
     if (!this.stripe || !this.elements) return;
     this.isProcessing = true;
 
+    // Doble validación por si han modificado el carrito con el form abierto
     const compraValida = await this.validarCompra();
     if (!compraValida) {
       this.isProcessing = false;
@@ -225,6 +156,70 @@ export class CartComponent implements OnInit {
       
       await this.procesarCompraExitosa();
       
+    }
+  }
+
+  async procesarCompraExitosa() {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    try {
+      const userRef = ref(this.db, `users/${user.uid}`);
+      const userSnap = await get(userRef);
+      const userData = userSnap.val();
+
+      // Transacción Atómica (Anti-Hackers)
+      for (const item of this.cartItems) {
+        const tallaKey = item.tallaElegida.toString().replace('.', '_');
+        const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
+
+        const result = await runTransaction(stockRef, (currentStock) => {
+          if (currentStock === null) return 0; 
+          if (currentStock < item.cantidad) return; // Aborta si no hay stock
+          return currentStock - item.cantidad; // Resta seguro
+        });
+
+        if (!result.committed) {
+          this.mostrarAlerta("¡Stock Agotado en el último segundo!", `Lo sentimos, alguien acaba de comprar las últimas unidades de "${item.name}".`);
+          this.isProcessing = false;
+          return; 
+        }
+      }
+
+      // Si el stock se restó bien, creamos el Ticket
+      const orderId = push(ref(this.db, 'orders')).key;
+      const itemsListFormatted = this.cartItems.map(item => `• ${item.name}`).join('\n');
+
+      const nuevoPedido = {
+        order_id: orderId,
+        order_date: Date.now(),
+        status: 'PAID',
+        total: this.total,
+        paymentMethod: 'Stripe (Tarjeta)',
+        address: userData.address.street,
+        city: userData.address.city,
+        zipCode: userData.address.zipCode,
+        itemsListFormatted: itemsListFormatted,
+        purchased_sneakers: this.cartItems.map(item => ({
+          id_producto_original: item.productId,
+          name_snap: item.name,
+          price_snap: item.price,
+          imagen_snap: item.imageUrl,
+          talla_elegida: item.tallaElegida.toString(),
+          cantidad_comprada: item.cantidad
+        }))
+      };
+
+      await update(ref(this.db, `orders/${user.uid}/${orderId}`), nuevoPedido);
+
+      // Limpiar y salir
+      this.cartService.clearCart();
+      this.router.navigate(['/success'], { state: { orderSuccess: true } });
+
+    } catch (error) {
+      console.error("Error crítico en la compra:", error);
+      this.mostrarAlerta("Error Interno", "Hubo un problema al procesar tu pedido en la base de datos.");
+      this.isProcessing = false;
     }
   }
 
