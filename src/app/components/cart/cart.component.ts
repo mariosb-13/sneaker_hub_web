@@ -19,8 +19,6 @@ export class CartComponent implements OnInit {
   private cartService = inject(CartService);
   private paymentService = inject(PaymentService);
   private router = inject(Router);
-  
-  // Inyectamos Auth y BD para hacer las comprobaciones previas
   private db = inject(Database);
   private auth = inject(Auth);
 
@@ -35,6 +33,11 @@ export class CartComponent implements OnInit {
   showPaymentForm: boolean = false;
   clientSecret: string | null = null;
 
+  // --- VARIABLES PARA EL MODAL DE BOOTSTRAP ---
+  mostrarModal: boolean = false;
+  modalTitulo: string = '';
+  modalMensaje: string = '';
+
   ngOnInit(): void {
     this.cartService.getCart().subscribe(items => {
       this.cartItems = items;
@@ -42,11 +45,26 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // --- EL PORTERO DE DISCOTECA (NUEVA FUNCIÓN) ---
+  // --- FUNCIÓN PARA ABRIR EL MODAL BONITO ---
+  mostrarAlerta(titulo: string, mensaje: string) {
+    this.modalTitulo = titulo;
+    this.modalMensaje = mensaje;
+    this.mostrarModal = true;
+  }
+
+  // --- FUNCIÓN PARA CERRAR EL MODAL ---
+  cerrarModal() {
+    this.mostrarModal = false;
+    // Si el error era por la dirección, lo mandamos al perfil al cerrar el modal
+    if (this.modalTitulo === 'Falta Dirección') {
+      this.router.navigate(['/perfil']);
+    }
+  }
+
   async validarCompra(): Promise<boolean> {
     const user = this.auth.currentUser;
     if (!user) {
-      alert("Debes iniciar sesión para comprar.");
+      this.mostrarAlerta('Sesión requerida', 'Debes iniciar sesión para poder comprar.');
       return false;
     }
 
@@ -56,19 +74,17 @@ export class CartComponent implements OnInit {
     
     if (userSnap.exists()) {
       const userData = userSnap.val();
-      // Verificamos que tenga los datos mínimos de envío (ajústalos si los llamas diferente)
-      if (!userData.address || !userData.city || !userData.zipCode) {
-        alert("¡Eh! No sabemos dónde enviarlo. Ve a tu Perfil y rellena tu dirección de envío antes de pagar.");
-        this.router.navigate(['/perfil']); // Lo mandamos al perfil a que lo rellene
-        return false;
+      if (!userData.address || !userData.address.street || !userData.address.city || !userData.address.zipCode) {
+        this.mostrarAlerta('Falta Dirección', 'No sabemos dónde enviarlo. Por favor, rellena tu dirección de envío antes de pagar.');
+        return false; // El redireccionamiento se hace ahora al cerrar el modal
       }
     } else {
       return false;
     }
 
-    // 2. COMPROBAR STOCK DE CADA ZAPATILLA
+    // 2. COMPROBAR STOCK
     for (let item of this.cartItems) {
-      const tallaKey = item.tallaElegida.replace('.', '_');
+      const tallaKey = item.tallaElegida.toString().replace('.', '_');
       const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
       const stockSnap = await get(stockRef);
       
@@ -77,28 +93,27 @@ export class CartComponent implements OnInit {
         stockReal = stockSnap.val();
       }
 
-      // Si pide más de lo que hay, bloqueamos todo
       if (stockReal < item.cantidad) {
-        alert(`❌ Error de stock: Solo nos quedan ${stockReal} unidades de "${item.name}" en talla ${item.tallaElegida}. Por favor, ajusta tu carrito.`);
+        this.mostrarAlerta('Problema de Stock', `¡Vaya! Solo nos quedan ${stockReal} unidades de "${item.name}" en talla ${item.tallaElegida}. Por favor, ajusta tu carrito.`);
         return false;
       }
     }
 
-    return true; // Si pasa las dos pruebas, ¡le dejamos sacar la tarjeta!
+    return true; 
   }
 
   async checkout() {
     if (this.cartItems.length === 0) return;
     this.isProcessing = true;
 
+    // VALIDACIÓN 1: Al darle a "Pasar por caja"
     const compraValida = await this.validarCompra();
     
     if (!compraValida) {
       this.isProcessing = false;
-      return; // Si no es válida, cortamos el proceso aquí mismo
+      return; 
     }
 
-    // Si todo está OK, seguimos con el proceso normal de Stripe
     this.clientSecret = await this.paymentService.obtenerClientSecret(this.cartItems, this.total);
 
     if (this.clientSecret) {
@@ -118,7 +133,7 @@ export class CartComponent implements OnInit {
         this.isProcessing = false;
       }, 0);
     } else {
-      alert('Error al generar la orden de pago');
+      this.mostrarAlerta('Error del servidor', 'Hubo un error al conectar con la pasarela de pago.');
       this.isProcessing = false;
     }
   }
@@ -126,6 +141,14 @@ export class CartComponent implements OnInit {
  async confirmarPago() {
     if (!this.stripe || !this.elements) return;
     this.isProcessing = true;
+
+    // 👇 VALIDACIÓN 2: DOBLE CHECK ANTES DE COBRAR 👇
+    const compraValida = await this.validarCompra();
+    if (!compraValida) {
+      this.isProcessing = false;
+      this.cancelarPago(); // Cerramos la tarjeta porque su carrito ya no es válido
+      return; 
+    }
 
     const { error, paymentIntent } = await this.stripe.confirmPayment({
       elements: this.elements,
@@ -136,7 +159,7 @@ export class CartComponent implements OnInit {
     });
 
     if (error) {
-      alert('Error: ' + error.message);
+      this.mostrarAlerta('Error en el pago', error.message);
       this.isProcessing = false;
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
       this.router.navigate(['/success'], { state: { orderSuccess: true } });
@@ -148,11 +171,14 @@ export class CartComponent implements OnInit {
     this.isProcessing = false;
   }
 
+  // 👇 BLOQUEO DE SEGURIDAD: SI TOCAN EL CARRITO, CERRAMOS EL PAGO 👇
   incrementQuantity(item: CartItem) {
+    if (this.showPaymentForm) this.cancelarPago();
     this.cartService.updateQuantity(item.detalleCartId, item.cantidad + 1);
   }
 
   decrementQuantity(item: CartItem) {
+    if (this.showPaymentForm) this.cancelarPago();
     if (item.cantidad > 1) {
       this.cartService.updateQuantity(item.detalleCartId, item.cantidad - 1);
     } else {
@@ -161,6 +187,7 @@ export class CartComponent implements OnInit {
   }
 
   removeItem(id: string) {
+    if (this.showPaymentForm) this.cancelarPago();
     this.cartService.removeFromCart(id);
   }
 }

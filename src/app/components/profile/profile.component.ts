@@ -32,8 +32,7 @@ export class ProfileComponent implements OnInit {
   address = {
     street: '',
     city: '',
-    zipCode: '',
-    country: ''
+    zipCode: ''
   };
 
   passwords = {

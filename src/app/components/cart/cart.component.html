@@ -87,3 +87,30 @@
 
   </div>
 </div>
+
+<div class="modal fade" 
+     [class.show]="mostrarModal" 
+     [style.display]="mostrarModal ? 'block' : 'none'" 
+     [style.backgroundColor]="mostrarModal ? 'rgba(0,0,0,0.5)' : 'transparent'"
+     tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      
+      <div class="modal-header border-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-bold text-danger">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ modalTitulo }}
+        </h5>
+        <button type="button" class="btn-close shadow-none" (click)="cerrarModal()"></button>
+      </div>
+      
+      <div class="modal-body py-4 px-4">
+        <p class="mb-0 fs-6 text-dark">{{ modalMensaje }}</p>
+      </div>
+      
+      <div class="modal-footer border-0 pt-0 pb-4 px-4">
+        <button type="button" class="btn btn-dark rounded-pill px-4" (click)="cerrarModal()">Entendido</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
