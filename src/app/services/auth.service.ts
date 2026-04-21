@@ -92,7 +92,6 @@ export class AuthService {
     }
   }
 
-  // MÉTODO PARA ENVIAR CORREO (CON LOGO Y URL DE RENDER)
   private async sendWelcomeEmail(userEmail: string, userName: string) {
     const mailCollection = collection(this.firestore, 'mail');
     const logoUrl = "https://firebasestorage.googleapis.com/v0/b/sneakerhub-3862d.firebasestorage.app/o/SneakerHub.png?alt=media&token=a42e0979-51b2-4a72-ad48-b8a9974ad37a";

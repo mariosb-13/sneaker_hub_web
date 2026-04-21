@@ -5,9 +5,12 @@ import { CartService } from '../../services/cart.service';
 import { CartItem } from '../../models/cartItem.model';
 import { PaymentService } from '../../services/payment.service';
 
-// IMPORTANTE: Añadimos runTransaction para el bloqueo atómico
+// Realtime Database para stock y pedidos
 import { Database, ref, get, update, push, runTransaction } from '@angular/fire/database';
 import { Auth } from '@angular/fire/auth';
+
+// Firestore para la extensión de correos
+import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-cart',
@@ -22,6 +25,7 @@ export class CartComponent implements OnInit {
   private router = inject(Router);
   private db = inject(Database);
   private auth = inject(Auth);
+  private firestore = inject(Firestore);
 
   cartItems: CartItem[] = [];
   total: number = 0;
@@ -34,7 +38,6 @@ export class CartComponent implements OnInit {
   showPaymentForm: boolean = false;
   clientSecret: string | null = null;
 
-  // Variables para el Modal de Bootstrap
   mostrarModal: boolean = false;
   modalTitulo: string = '';
   modalMensaje: string = '';
@@ -98,37 +101,40 @@ export class CartComponent implements OnInit {
     if (!user) return;
 
     try {
-      // 1. INTENTAR DESCONTAR STOCK ATÓMICAMENTE
       for (const item of this.cartItems) {
         const tallaKey = item.tallaElegida.toString().replace('.', '_');
         const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
 
         const result = await runTransaction(stockRef, (currentStock) => {
           if (currentStock === null) return 0;
-          if (currentStock < item.cantidad) return; // ABORTAR si alguien compró mientras pagábamos
+          if (currentStock < item.cantidad) return; 
           return currentStock - item.cantidad;
         });
 
         if (!result.committed) {
-          this.mostrarAlerta("¡Vendido!", `Lo sentimos, alguien ha comprado la última unidad de "${item.name}" mientras procesabas el pago. Contacta con soporte para la devolución.`);
+          this.mostrarAlerta("¡Vendido!", `Alguien ha comprado la última unidad de "${item.name}" mientras procesabas el pago. Contacta con soporte.`);
           return;
         }
       }
 
-      // 2. SI EL STOCK SE RESTÓ BIEN, GUARDAMOS EL PEDIDO
       const userRef = ref(this.db, `users/${user.uid}`);
       const userSnap = await get(userRef);
       const userData = userSnap.val();
       const orderId = push(ref(this.db, 'orders')).key;
+
+      const correoSeguro = user?.email || userData?.email || '';
+      const nombreSeguro = userData?.fullName || user?.displayName || 'Usuario';
 
       const nuevoPedido = {
         order_id: orderId,
         order_date: Date.now(),
         status: 'PAID',
         total: this.total,
-        address: userData.address.street,
-        city: userData.address.city,
-        zipCode: userData.address.zipCode,
+        userName: nombreSeguro,
+        userEmail: correoSeguro,
+        address: userData?.address?.street || '',
+        city: userData?.address?.city || '',
+        zipCode: userData?.address?.zipCode || '',
         purchased_sneakers: this.cartItems.map(item => ({
           name_snap: item.name,
           price_snap: item.price,
@@ -139,28 +145,30 @@ export class CartComponent implements OnInit {
       };
 
       await update(ref(this.db, `orders/${user.uid}/${orderId}`), nuevoPedido);
+      
+      if (correoSeguro) {
+        await this.enviarCorreoConfirmacion(correoSeguro, nombreSeguro, orderId!);
+      }
+
       this.cartService.clearCart();
       this.router.navigate(['/success'], { state: { orderSuccess: true } });
 
     } catch (error) {
-      this.mostrarAlerta("Error Crítico", "El pago se realizó pero hubo un error en la base de datos.");
+      this.mostrarAlerta("Error Crítico", "Hubo un error al procesar el pedido.");
     }
   }
 
-async confirmarPago() {
+  async confirmarPago() {
     if (!this.stripe || !this.elements) return;
     this.isProcessing = true;
 
-    // 1. INTENTAMOS APARTAR EL STOCK ANTES DE COBRAR
     const stockApartado = await this.apartarStock();
-    
     if (!stockApartado) {
       this.isProcessing = false;
       this.cancelarPago();
-      return; // Si no hemos podido restar el stock, ni siquiera llamamos a Stripe
+      return; 
     }
 
-    // 2. SI TENEMOS EL STOCK APARTADO, LLAMAMOS A STRIPE
     const { error, paymentIntent } = await this.stripe.confirmPayment({
       elements: this.elements,
       confirmParams: { return_url: `${window.location.origin}/success` },
@@ -168,36 +176,30 @@ async confirmarPago() {
     });
 
     if (error) {
-      // 3. SI EL PAGO FALLA (Tarjeta rechazada, etc.), DEVOLVEMOS EL STOCK
       await this.devolverStock();
-      this.mostrarAlerta('Pago fallido', error.message || 'Error al procesar la tarjeta');
+      this.mostrarAlerta('Pago fallido', error.message || 'Error en la tarjeta');
       this.isProcessing = false;
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      // 4. PAGO OK -> GUARDAMOS EL PEDIDO FINAL
       await this.guardarPedidoFinal();
     }
   }
 
-  // FUNCIÓN PARA RESTAR EL STOCK (ANTES DE COBRAR)
   async apartarStock(): Promise<boolean> {
     try {
       for (const item of this.cartItems) {
         const tallaKey = item.tallaElegida.toString().replace('.', '_');
         const stockRef = ref(this.db, `sneakers/${item.productId}/sizes/${tallaKey}`);
-
         const result = await runTransaction(stockRef, (currentStock) => {
           if (currentStock === null) return 0;
-          if (currentStock < item.cantidad) return; // ABORTAR si no hay suficiente
+          if (currentStock < item.cantidad) return; 
           return currentStock - item.cantidad;
         });
-
         if (!result.committed) return false;
       }
       return true;
     } catch (e) { return false; }
   }
 
-  // FUNCIÓN PARA DEVOLVER EL STOCK SI EL PAGO FALLA
   async devolverStock() {
     for (const item of this.cartItems) {
       const tallaKey = item.tallaElegida.toString().replace('.', '_');
@@ -212,14 +214,19 @@ async confirmarPago() {
     const userData = (await get(userRef)).val();
     const orderId = push(ref(this.db, 'orders')).key;
 
+    const correoSeguro = user?.email || userData?.email || '';
+    const nombreSeguro = userData?.fullName || user?.displayName || 'Usuario';
+
     const nuevoPedido = {
       order_id: orderId,
       order_date: Date.now(),
       status: 'PAID',
       total: this.total,
-      address: userData.address.street,
-      city: userData.address.city,
-      zipCode: userData.address.zipCode,
+      userName: nombreSeguro,
+      userEmail: correoSeguro,
+      address: userData?.address?.street || '',
+      city: userData?.address?.city || '',
+      zipCode: userData?.address?.zipCode || '',
       purchased_sneakers: this.cartItems.map(item => ({
         name_snap: item.name,
         price_snap: item.price,
@@ -230,8 +237,76 @@ async confirmarPago() {
     };
 
     await update(ref(this.db, `orders/${user?.uid}/${orderId}`), nuevoPedido);
+
+    if (correoSeguro) {
+      await this.enviarCorreoConfirmacion(correoSeguro, nombreSeguro, orderId!);
+    }
+
     this.cartService.clearCart();
     this.router.navigate(['/success'], { state: { orderSuccess: true } });
+  }
+
+  async enviarCorreoConfirmacion(emailDestino: string, nombreCliente: string, orderId: string) {
+    try {
+      const mailRef = collection(this.firestore, 'mail'); 
+      
+      const productosHtml = this.cartItems.map(item => `
+        <div style="display: flex; align-items: center; border-bottom: 1px solid #f0f0f0; padding: 15px 0;">
+          <img src="${item.imageUrl}" style="width: 70px; height: 70px; object-fit: contain; margin-right: 15px;" alt="${item.name}">
+          <div style="flex-grow: 1; text-align: left;">
+            <p style="margin: 0; font-weight: bold; color: #333333; font-size: 14px;">${item.name}</p>
+            <p style="margin: 4px 0 0 0; color: #888888; font-size: 11px;">Talla: ${item.tallaElegida.toString().replace('_', '.')} | Cantidad: ${item.cantidad}</p>
+          </div>
+          <div style="font-weight: bold; color: #333333; font-size: 14px; white-space: nowrap; margin-left: 10px;">
+            ${(item.price * item.cantidad).toFixed(2).replace('.', ',')} €
+          </div>
+        </div>
+      `).join('');
+
+      await addDoc(mailRef, {
+        to: emailDestino,
+        message: {
+          subject: '¡Gracias por tu compra en SneakerHub! 🚀',
+          html: `
+            <div style="background-color: #fcfcfc; padding: 40px 10px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+              <div style="max-width: 550px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid #eeeeee;">
+                
+                <div style="text-align: center; padding: 40px 30px 30px 30px;">
+                  <img src="https://firebasestorage.googleapis.com/v0/b/sneakerhub-3862d.firebasestorage.app/o/SneakerHub.png?alt=media&token=a42e0979-51b2-4a72-ad48-b8a9974ad37a" 
+                       alt="SneakerHub" style="width: 250px; margin-bottom: 40px;">
+                  
+                  <h1 style="color: #333333; font-size: 24px; margin: 0 0 15px 0; font-weight: bold;">¡Gracias por tu compra!</h1>
+                  <p style="color: #666666; font-size: 15px; margin: 0;">Tu pedido <strong>#${orderId.substring(1, 20)}</strong> se ha procesado correctamente.</p>
+                </div>
+
+                <div style="padding: 0 40px;">
+                  ${productosHtml}
+                </div>
+
+                <div style="padding: 30px 40px;">
+                  <div style="background-color: #f9f9f9; border: 1px dashed #dddddd; border-radius: 8px; padding: 20px; text-align: right;">
+                    <span style="color: #333333; font-size: 18px; margin-right: 10px;">Total pagado: </span>
+                    <strong style="color: #000000; font-size: 22px;">${this.total.toFixed(2).replace('.', ',')} €</strong>
+                  </div>
+                </div>
+
+                <div style="text-align: center; padding: 0 40px 40px 40px;">
+                  <p style="color: #888888; font-size: 13px; margin-bottom: 30px;">En breve te enviaremos la información de seguimiento.</p>
+                  
+                  <a href="${window.location.origin}/home" 
+                     style="background-color: #000000; color: #ffffff; text-decoration: none; padding: 15px 40px; font-weight: bold; font-size: 13px; border-radius: 4px; display: inline-block; text-transform: uppercase;">
+                     SEGUIR COMPRANDO
+                  </a>
+                </div>
+
+              </div>
+            </div>
+          `
+        }
+      });
+    } catch (error) {
+      console.error('Error al enviar el correo:', error);
+    }
   }
 
   async checkout() {
@@ -249,16 +324,29 @@ async confirmarPago() {
     } else { this.isProcessing = false; }
   }
 
-cancelarPago() {
+  cancelarPago() {
     this.showPaymentForm = false;
     this.isProcessing = false;
-    
     this.router.navigate(['/cancel'], { state: { orderCancelled: true } }); 
-  }  incrementQuantity(item: CartItem) { if (this.showPaymentForm) this.cancelarPago(); this.cartService.updateQuantity(item.detalleCartId, item.cantidad + 1); }
+  }
 
-calculateTotal() {
-  this.total = this.cartItems.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
-}
-  decrementQuantity(item: CartItem) { if (this.showPaymentForm) this.cancelarPago(); if (item.cantidad > 1) this.cartService.updateQuantity(item.detalleCartId, item.cantidad - 1); else this.removeItem(item.detalleCartId); }
-  removeItem(id: string) { if (this.showPaymentForm) this.cancelarPago(); this.cartService.removeFromCart(id); }
+  incrementQuantity(item: CartItem) { 
+    if (this.showPaymentForm) this.cancelarPago(); 
+    this.cartService.updateQuantity(item.detalleCartId, item.cantidad + 1); 
+  }
+
+  calculateTotal() {
+    this.total = this.cartItems.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+  }
+
+  decrementQuantity(item: CartItem) { 
+    if (this.showPaymentForm) this.cancelarPago(); 
+    if (item.cantidad > 1) this.cartService.updateQuantity(item.detalleCartId, item.cantidad - 1); 
+    else this.removeItem(item.detalleCartId); 
+  }
+
+  removeItem(id: string) { 
+    if (this.showPaymentForm) this.cancelarPago(); 
+    this.cartService.removeFromCart(id); 
+  }
 }
