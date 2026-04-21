@@ -41,34 +41,46 @@ export class CartService {
     return this.cartSubject.asObservable();
   }
 
-  addToCart(sneaker: Sneaker, size: string) {
-    const user = this.auth.currentUser;
-    if (!user || !sneaker.id) return;
-
-    const tallaFormateada = size.replace('.', '_');
-    const detalleCartId = `${sneaker.id}_${tallaFormateada}`;
-
-    const existingItem = this.cartItems.find(item => item.detalleCartId === detalleCartId);
-
-    if (existingItem) {
-      const itemRef = ref(this.db, `cart/${user.uid}/${detalleCartId}/cantidad`);
-      set(itemRef, existingItem.cantidad + 1);
-    } else {
-      const newItem: CartItem = {
-        detalleCartId: detalleCartId,
-        productId: sneaker.id,
-        name: sneaker.name,
-        brand: sneaker.brand,
-        price: sneaker.price,
-        imageUrl: sneaker.imageUrl,
-        tallaElegida: size,
-        cantidad: 1
-      };
-
-      const itemRef = ref(this.db, `cart/${user.uid}/${detalleCartId}`);
-      set(itemRef, newItem);
-    }
+  // Añade esta función privada al principio de la clase CartService
+private calcularPrecioFinal(sneaker: Sneaker): number {
+  if (sneaker.discount?.isActive && sneaker.discount.percentage > 0) {
+    return sneaker.price * (1 - sneaker.discount.percentage / 100);
   }
+  return sneaker.price;
+}
+
+// Modifica el método addToCart
+addToCart(sneaker: Sneaker, size: string) {
+  const user = this.auth.currentUser;
+  if (!user) return;
+
+  const tallaFormateada = size.replace('.', '_');
+  const detalleCartId = `${sneaker.id}_${tallaFormateada}`;
+  const existingItem = this.cartItems.find(item => item.detalleCartId === detalleCartId);
+
+  // Calculamos el precio que realmente se va a cobrar
+  const precioFinal = this.calcularPrecioFinal(sneaker);
+
+  if (existingItem) {
+    const itemRef = ref(this.db, `cart/${user.uid}/${detalleCartId}/cantidad`);
+    set(itemRef, existingItem.cantidad + 1);
+  } else {
+    const newItem = {
+      detalleCartId: detalleCartId,
+      productId: sneaker.id,
+      name: sneaker.name,
+      brand: sneaker.brand,
+      price: precioFinal,
+      originalPrice: sneaker.price, 
+      imageUrl: sneaker.imageUrl,
+      tallaElegida: size,
+      cantidad: 1
+    };
+
+    const itemRef = ref(this.db, `cart/${user.uid}/${detalleCartId}`);
+    set(itemRef, newItem);
+  }
+}
 
   updateQuantity(detalleCartId: string, nuevaCantidad: number) {
     const user = this.auth.currentUser;

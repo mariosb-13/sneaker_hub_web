@@ -255,6 +255,10 @@ cancelarPago() {
     
     this.router.navigate(['/cancel'], { state: { orderCancelled: true } }); 
   }  incrementQuantity(item: CartItem) { if (this.showPaymentForm) this.cancelarPago(); this.cartService.updateQuantity(item.detalleCartId, item.cantidad + 1); }
+
+calculateTotal() {
+  this.total = this.cartItems.reduce((acc, item) => acc + (item.price * item.cantidad), 0);
+}
   decrementQuantity(item: CartItem) { if (this.showPaymentForm) this.cancelarPago(); if (item.cantidad > 1) this.cartService.updateQuantity(item.detalleCartId, item.cantidad - 1); else this.removeItem(item.detalleCartId); }
   removeItem(id: string) { if (this.showPaymentForm) this.cancelarPago(); this.cartService.removeFromCart(id); }
 }

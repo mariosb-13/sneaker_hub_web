@@ -1,85 +1,144 @@
 <div class="container py-5 mt-5">
   <div class="row g-5">
-    
+
     <div class="col-lg-8">
-      <h2 class="fw-bold mb-5">Carrito</h2>
+      <h2 class="fw-bold mb-5">Tu Carrito</h2>
 
       <div *ngIf="cartItems.length > 0; else emptyCart">
-        <div *ngFor="let item of cartItems" class="row align-items-center mb-4 pb-4 border-bottom">
+        <div *ngFor="let item of cartItems"
+          class="row align-items-center mb-4 pb-4 border-bottom">
+
           <div class="col-md-3 text-center">
-            <img [src]="item.imageUrl" [alt]="item.name" class="img-fluid rounded mb-3" style="max-height: 120px; object-fit: contain;">
-            
-            <div class="d-flex align-items-center justify-content-center bg-light rounded-pill p-1 mx-auto" style="width: 100px;">
-              <button class="btn btn-sm border-0" (click)="decrementQuantity(item)">-</button>
+            <img [src]="item.imageUrl" [alt]="item.name"
+              class="img-fluid rounded mb-3"
+              style="max-height: 120px; object-fit: contain;">
+
+            <div
+              class="d-flex align-items-center justify-content-center bg-light rounded-pill p-1 mx-auto"
+              style="width: 100px;">
+              <button class="btn btn-sm border-0"
+                (click)="decrementQuantity(item)"
+                [disabled]="isProcessing">-</button>
               <span class="mx-2 fw-bold">{{ item.cantidad }}</span>
-              <button class="btn btn-sm border-0" (click)="incrementQuantity(item)">+</button>
+              <button class="btn btn-sm border-0"
+                (click)="incrementQuantity(item)"
+                [disabled]="isProcessing">+</button>
             </div>
           </div>
 
           <div class="col-md-6">
-            <h5 class="fw-bold mb-1">{{ item.name }}</h5>
-            <p class="small text-muted mb-0">Talla {{ item.tallaElegida }}</p>
-            <button class="btn btn-sm btn-link text-danger p-0 mt-2 text-decoration-none" (click)="removeItem(item.detalleCartId)">
-              Eliminar
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <h5 class="fw-bold mb-0">{{ item.name }}</h5>
+              <span
+                *ngIf="item.originalPrice && item.price < item.originalPrice"
+                class="badge bg-danger rounded-pill" style="font-size: 0.7rem;">
+                OFERTA
+              </span>
+            </div>
+            <p class="text-secondary small mb-0">{{ item.brand }}</p>
+            <p class="small text-muted mb-3">Talla {{
+              item.tallaElegida.replace('_', '.') }}</p>
+
+            <button
+              class="btn btn-sm btn-link text-danger p-0 text-decoration-none fw-bold"
+              (click)="removeItem(item.detalleCartId)"
+              [disabled]="isProcessing">
+              <i class="bi bi-trash3 me-1"></i> Eliminar
             </button>
           </div>
 
           <div class="col-md-3 text-end">
-            <span class="fs-5 fw-bold">{{ item.price * item.cantidad }} €</span>
+            <div
+              *ngIf="item.originalPrice && item.price < item.originalPrice; else precioNormal">
+              <p class="text-muted text-decoration-line-through small mb-0">
+                {{ item.originalPrice | number:'1.2-2' }} €
+              </p>
+              <p class="fw-bold text-danger fs-5 mb-0">
+                {{ item.price | number:'1.2-2' }} €
+              </p>
+            </div>
+            <ng-template #precioNormal>
+              <p class="fw-bold text-dark fs-5 mb-0">
+                {{ item.price | number:'1.2-2' }} €
+              </p>
+            </ng-template>
+
+            <div class="mt-3 pt-2 border-top border-light">
+              <p class="small text-muted mb-0">Subtotal:</p>
+              <p class="fw-bold text-dark mb-0">
+                {{ (item.price * item.cantidad) | number:'1.2-2' }} €
+              </p>
+            </div>
           </div>
+
         </div>
       </div>
 
       <ng-template #emptyCart>
         <div class="text-center py-5">
-          <i class="bi bi-cart-x display-1 text-muted"></i>
-          <p class="fs-4 mt-3">Tu carrito está vacío</p>
-          <button class="btn btn-dark mt-2 rounded-pill px-4" routerLink="/home">Seguir comprando</button>
+          <i class="bi bi-cart-x text-light display-1 mb-4"></i>
+          <h4 class="fw-bold">Tu carrito está vacío</h4>
+          <p class="text-muted">Parece que aún no has añadido ninguna zapatilla
+            a tu colección.</p>
+          <a routerLink="/sneakers"
+            class="btn btn-dark rounded-pill px-5 mt-3">Ver Catálogo</a>
         </div>
       </ng-template>
     </div>
 
     <div class="col-lg-4">
-      <div class="p-4 bg-white rounded-3 shadow-sm border border-light-subtle sticky-top" style="top: 100px;">
-        <h3 class="fw-bold mb-4">Resumen</h3>
-        
-        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-          <span class="fs-5 text-secondary">Total</span>
-          <span class="fs-3 fw-bold">{{ total }} €</span>
+      <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top"
+        style="top: 100px;">
+        <h4 class="fw-bold mb-4">Resumen</h4>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span>Envío</span>
+          <span class="text-success fw-bold">Gratis</span>
         </div>
 
-        <div class="d-grid" *ngIf="!showPaymentForm">
-          <button class="btn btn-dark btn-lg rounded-pill py-3 fw-bold" 
-                  [disabled]="cartItems.length === 0 || isProcessing"
-                  (click)="checkout()">
-            <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-            {{ isProcessing ? 'Cargando...' : 'Pasar por caja' }}
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-5">
+          <span class="fw-bold fs-5">Total</span>
+          <span class="fw-bold fs-3 text-dark">{{ total | number:'1.2-2' }}
+            €</span>
+        </div>
+
+        <div *ngIf="!showPaymentForm">
+          <button
+            class="btn btn-dark w-100 rounded-pill py-3 fw-bold text-uppercase shadow"
+            (click)="checkout()"
+            [disabled]="cartItems.length === 0 || isProcessing">
+            <span *ngIf="!isProcessing">Tramitar Pedido</span>
+            <span *ngIf="isProcessing"
+              class="spinner-border spinner-border-sm me-2"></span>
           </button>
         </div>
 
-        <div *ngIf="showPaymentForm" class="mt-2">
-          <h6 class="fw-bold text-uppercase mb-3" style="font-size: 0.75rem; letter-spacing: 1px;">Datos del Pago</h6>
-          
+        <div *ngIf="showPaymentForm" class="fade-in">
+          <h6 class="fw-bold mb-3 border-bottom pb-2">Datos de Pago</h6>
           <div id="payment-element" class="mb-4">
-            </div>
+          </div>
 
           <div class="d-grid gap-2">
-            <button class="btn btn-dark btn-lg rounded-pill py-3 fw-bold"
-                    (click)="confirmarPago()"
-                    [disabled]="isProcessing">
-              <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-              Pagar {{ total }} €
+            <button class="btn btn-primary rounded-pill py-3 fw-bold"
+              (click)="confirmarPago()"
+              [disabled]="isProcessing">
+              <span *ngIf="!isProcessing">Pagar Ahora</span>
+              <span *ngIf="isProcessing"
+                class="spinner-border spinner-border-sm me-2"></span>
             </button>
-            <button class="btn btn-link text-secondary btn-sm text-decoration-none" 
-                    (click)="cancelarPago()" 
-                    [disabled]="isProcessing">
+            <button class="btn btn-link text-muted text-decoration-none"
+              (click)="cancelarPago()"
+              [disabled]="isProcessing">
               Cancelar
             </button>
           </div>
-          
+
           <div class="mt-3 text-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" 
-                 alt="Stripe" style="height: 15px; opacity: 0.5;">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg"
+              alt="Stripe" style="height: 15px; opacity: 0.5;">
           </div>
         </div>
       </div>
@@ -88,29 +147,32 @@
   </div>
 </div>
 
-<div class="modal fade" 
-     [class.show]="mostrarModal" 
-     [style.display]="mostrarModal ? 'block' : 'none'" 
-     [style.backgroundColor]="mostrarModal ? 'rgba(0,0,0,0.5)' : 'transparent'"
-     tabindex="-1" aria-hidden="true">
+<div class="modal fade"
+  [class.show]="mostrarModal"
+  [style.display]="mostrarModal ? 'block' : 'none'"
+  [style.backgroundColor]="mostrarModal ? 'rgba(0,0,0,0.5)' : 'transparent'"
+  tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg rounded-4">
-      
+
       <div class="modal-header border-0 pb-0 pt-4 px-4">
         <h5 class="modal-title fw-bold text-danger">
           <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ modalTitulo }}
         </h5>
-        <button type="button" class="btn-close shadow-none" (click)="cerrarModal()"></button>
+        <button type="button" class="btn-close shadow-none"
+          (click)="cerrarModal()"></button>
       </div>
-      
+
       <div class="modal-body py-4 px-4">
-        <p class="mb-0 fs-6 text-dark">{{ modalMensaje }}</p>
+        <p class="text-secondary mb-0 fs-6">{{ modalMensaje }}</p>
       </div>
-      
+
       <div class="modal-footer border-0 pt-0 pb-4 px-4">
-        <button type="button" class="btn btn-dark rounded-pill px-4" (click)="cerrarModal()">Entendido</button>
+        <button type="button"
+          class="btn btn-dark w-100 rounded-pill py-2 fw-bold"
+          (click)="cerrarModal()">Entendido</button>
       </div>
-      
+
     </div>
   </div>
 </div>

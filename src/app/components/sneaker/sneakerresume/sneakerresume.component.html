@@ -3,16 +3,35 @@
 
   <div class="card-img-top card-img-container d-flex justify-content-center align-items-center p-3 bg-white">
     <img [src]="sneaker.imageUrl" [alt]="sneaker.name" class="img-fluid">
+    
+    <div *ngIf="sneaker.discount?.isActive && sneaker.discount!.percentage > 0" 
+         class="position-absolute top-0 end-0 m-3 badge bg-danger rounded-pill px-3 py-2 shadow-sm">
+      -{{ sneaker.discount!.percentage }}%
+    </div>
   </div>
 
   <div class="card-body pt-2 pb-4 px-4 d-flex flex-column flex-grow-1">
     <h6 class="card-title text-dark mb-2 fw-normal text-start">
-      {{ sneaker.name }} </h6>
+      {{ sneaker.name }} 
+    </h6>
 
     <div class="mt-auto">
-      <p class="card-text fw-bold text-dark mb-1 fs-5 text-start">
-        {{ sneaker.price | number:'1.2-2' }} €
-      </p>
+      <div class="text-start mb-1">
+        <ng-container *ngIf="sneaker.discount?.isActive && sneaker.discount!.percentage > 0; else noDiscount">
+          <span class="text-muted text-decoration-line-through small me-2">
+            {{ sneaker.price | number:'1.2-2' }} €
+          </span>
+          <span class="card-text fw-bold text-danger fs-5">
+            {{ (sneaker.price * (1 - sneaker.discount!.percentage / 100)) | number:'1.2-2' }} €
+          </span>
+        </ng-container>
+
+        <ng-template #noDiscount>
+          <p class="card-text fw-bold text-dark mb-0 fs-5">
+            {{ sneaker.price | number:'1.2-2' }} €
+          </p>
+        </ng-template>
+      </div>
 
       <p class="card-text text-secondary small fw-medium mb-0 text-start text-uppercase brand-text">
         {{ sneaker.brand }}

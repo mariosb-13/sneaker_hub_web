@@ -1,0 +1,74 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold m-0"><i class="bi bi-hdd-network me-2"></i>Storage Explorer</h2>
+  <button class="btn btn-dark rounded-pill px-4" (click)="scanStorage()" [disabled]="isLoading">
+    <i class="bi bi-arrow-clockwise me-1"></i> Actualizar
+  </button>
+</div>
+
+<div class="row g-3 mb-4" *ngIf="!isLoading">
+  <div class="col-md-8">
+    <div class="input-group shadow-sm">
+      <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+      <input type="text" class="form-control border-start-0 ps-0" placeholder="Filtrar por nombre..." [(ngModel)]="searchTerm" (input)="applyFilter()">
+    </div>
+  </div>
+  <div class="col-md-4 d-flex gap-2">
+    <button class="btn btn-outline-secondary w-100 btn-sm" (click)="toggleAll(true)">Expandir</button>
+    <button class="btn btn-outline-secondary w-100 btn-sm" (click)="toggleAll(false)">Contraer</button>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="text-center my-5">
+  <div class="spinner-border text-primary" role="status"></div>
+  <p class="text-muted mt-2">Sincronizando con Storage...</p>
+</div>
+
+<div *ngIf="!isLoading">
+  <div *ngFor="let folder of filteredFolders" class="card mb-3 shadow-sm border-0 overflow-hidden rounded-4">
+    
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2" 
+         (click)="toggleFolder(folder)" style="cursor: pointer;">
+      
+      <div class="d-flex align-items-center overflow-hidden">
+        <i class="bi fs-5 me-2" [ngClass]="folder.isExpanded ? 'bi-chevron-down text-info' : 'bi-chevron-right text-muted'"></i>
+        
+        <div class="bg-white rounded-3 p-1 me-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+          <img *ngIf="folder.thumbnailUrl" [src]="folder.thumbnailUrl" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+          <i *ngIf="!folder.thumbnailUrl" class="bi bi-image text-muted"></i>
+        </div>
+
+        <h6 class="mb-0 fw-bold text-truncate">{{ folder.folderName }}</h6>
+      </div>
+
+      <span class="badge bg-secondary rounded-pill">{{ folder.files.length }}</span>
+    </div>
+
+    <div class="card-body bg-light border-top p-3" *ngIf="folder.isExpanded">
+      
+      <div class="mb-3 d-flex justify-content-end">
+        <input type="file" #fileInput hidden multiple (change)="onFilesSelected($event, folder)">
+        <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" 
+                (click)="$event.stopPropagation(); fileInput.click()" [disabled]="isUploading">
+          <i class="bi bi-cloud-upload-fill me-2"></i> 
+          {{ isUploading ? 'Subiendo...' : 'Añadir imágenes' }}
+        </button>
+      </div>
+
+      <div class="row g-2">
+        <div class="col-6 col-md-3 col-lg-2" *ngFor="let file of folder.files">
+          <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+            <div class="d-flex align-items-center justify-content-center p-2 bg-white" style="height: 100px;">
+              <img [src]="file.url" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+            </div>
+            <div class="card-body p-2 text-center bg-white border-top">
+              <small class="d-block text-truncate text-muted mb-2" style="font-size: 0.65rem;">{{ file.name }}</small>
+              <button class="btn btn-outline-danger btn-sm w-100 border-0" (click)="deleteFile(folder, file)">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

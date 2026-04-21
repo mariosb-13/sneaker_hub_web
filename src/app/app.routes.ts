@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard, redirectLoggedInTo, redirectUnauthorizedTo } from '@angular/fire/auth-guard';
 
-// Importación de Componentes
 import { LoginComponent } from './components/auth/login/login.component';
 import { SigninComponent } from './components/auth/signin/signin.component';
 import { HomeComponent } from './components/home/home.component';
@@ -22,6 +21,7 @@ import { adminGuard } from './guards/admin.guard';
 import { successGuard } from './guards/success.guard';
 import { CancelComponent } from './components/cancel/cancel.component';
 import { cancelGuard } from './guards/cancel.guard';
+import { AdminStorageComponent } from './components/admin/admin-storage/admin-storage.component';
 
 // Guardias de navegación de Firebase
 const redirectLoggedInToHome = () => redirectLoggedInTo(['/home']);
@@ -98,7 +98,8 @@ export const routes: Routes = [
         { path: 'dashboard', component: AdminDashboardComponent },
         { path: 'usuarios', component: AdminUsersComponent },
         { path: 'zapatillas', component: AdminProductsComponent },
-        { path: 'pedidos', component: AdminOrdersComponent }
+        { path: 'pedidos', component: AdminOrdersComponent },
+        { path: 'storage', component: AdminStorageComponent }
       ]
     },
 

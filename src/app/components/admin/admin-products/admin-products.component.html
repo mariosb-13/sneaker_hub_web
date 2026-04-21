@@ -56,17 +56,34 @@
       </thead>
       <tbody>
         <tr *ngFor="let s of productosFiltrados" class="border-top">
+          
           <td class="ps-4 py-3">
             <div class="d-flex align-items-center">
               <div class="bg-light rounded-3 p-2 me-3 shadow-sm border">
                 <img [src]="s.imageUrl" style="width: 45px; height: 45px; object-fit: contain;">
               </div>
               <div class="d-flex flex-column">
-                <span class="fw-bold text-dark">{{ s.name }}</span>
-                <span class="text-primary fw-bold small">{{ s.price | number:'1.2-2' }} €</span>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-bold text-dark">{{ s.name }}</span>
+                  <span *ngIf="s.discount?.isActive && s.discount!.percentage > 0" class="badge bg-danger px-2 py-1" style="font-size: 0.65rem;">
+                    -{{ s.discount!.percentage }}%
+                  </span>
+                </div>
+                
+                <ng-container *ngIf="s.discount?.isActive && s.discount!.percentage > 0; else noDiscountAdmin">
+                  <div class="d-flex align-items-center gap-2 mt-1">
+                    <span class="text-muted text-decoration-line-through" style="font-size: 0.75rem;">{{ s.price | number:'1.2-2' }} €</span>
+                    <span class="text-danger fw-bold small">{{ getDiscountedPrice(s.price, s.discount!.percentage) | number:'1.2-2' }} €</span>
+                  </div>
+                </ng-container>
+                <ng-template #noDiscountAdmin>
+                  <span class="text-primary fw-bold small">{{ s.price | number:'1.2-2' }} €</span>
+                </ng-template>
+
               </div>
             </div>
           </td>
+
           <td>
             <div class="d-flex flex-column">
               <span class="badge bg-dark rounded-pill align-self-start mb-1" style="font-size: 0.6rem;">{{ s.brand }}</span>
@@ -81,7 +98,7 @@
           <td class="pe-4 text-end">
             <div class="btn-group">
               <button class="btn btn-sm btn-outline-light border-0 text-primary p-2" (click)="abrirModalEditar(s)" data-bs-toggle="modal" data-bs-target="#sneakerModal"><i class="bi bi-pencil-square fs-5"></i></button>
-              <button class="btn btn-sm btn-outline-light border-0 text-danger p-2" (click)="eliminarZapatilla(s.id!)"><i class="bi bi-trash3-fill fs-5"></i></button>
+              <button class="btn btn-sm btn-outline-light border-0 text-danger p-2" (click)="pedirConfirmacionEliminar(s.id!)"><i class="bi bi-trash3-fill fs-5"></i></button>
             </div>
           </td>
         </tr>
@@ -118,8 +135,7 @@
           </div>
         </div>
 
-        <div class="card border-0 rounded-4 shadow-sm p-4" 
-             [ngClass]="isEditingBrand ? 'bg-primary bg-opacity-10' : 'bg-white'">
+        <div class="card border-0 rounded-4 shadow-sm p-4" [ngClass]="isEditingBrand ? 'bg-primary bg-opacity-10' : 'bg-white'">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h5 class="fw-bold m-0">
               <i class="bi" [ngClass]="isEditingBrand ? 'bi-pencil-fill text-primary' : 'bi-plus-circle-fill text-dark'"></i>
@@ -178,7 +194,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="sneakerModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="sneakerModal" tabindex="-1" aria-hidden="true" data-bs-focus="false">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
       <div class="modal-header border-0 pt-4 px-4 bg-white">
@@ -198,7 +214,7 @@
                 <option *ngFor="let m of marcasDB" [value]="m.name">{{ m.name }}</option>
               </select>
             </div>
-            <div class="col-md-4"><label class="form-label small fw-bold text-muted mb-1">Precio (€)</label><input type="number" class="form-control bg-light border-0 py-2" [(ngModel)]="selectedSneaker.price" name="price" required></div>
+            <div class="col-md-4"><label class="form-label small fw-bold text-muted mb-1">Precio Base (€)</label><input type="number" class="form-control bg-light border-0 py-2" [(ngModel)]="selectedSneaker.price" name="price" required></div>
             <div class="col-md-4">
               <label class="form-label small fw-bold text-muted mb-1">Género</label>
               <select class="form-select bg-light border-0 py-2" [(ngModel)]="selectedSneaker.gender" name="gender">
@@ -217,20 +233,60 @@
             </div>
 
             <div class="col-12 mt-4">
+              <h6 class="fw-bold small border-bottom pb-2 mb-3 text-uppercase text-secondary" style="letter-spacing: 1px;">Promoción y Descuento</h6>
+              <div class="card border-0 bg-light p-3 rounded-4">
+                <div class="row align-items-center">
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted mb-1">Porcentaje (%)</label>
+                    <div class="input-group">
+                      <input type="number" class="form-control border-0 py-2" 
+                             [(ngModel)]="selectedSneaker.discount.percentage" 
+                             name="discountPct" min="0" max="99">
+                      <span class="input-group-text border-0 bg-white">%</span>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check form-switch mt-3 mt-md-0">
+                      <input class="form-check-input me-2" type="checkbox" 
+                             [(ngModel)]="selectedSneaker.discount.isActive" 
+                             name="discountActive" style="width: 2.5em; height: 1.2em;">
+                      <label class="form-check-label fw-bold small text-dark mt-1">Oferta Activa</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4 text-end" *ngIf="selectedSneaker.discount.isActive && selectedSneaker.discount.percentage > 0">
+                    <label class="d-block small text-muted mb-0">Precio con rebaja:</label>
+                    <span class="fw-bold text-primary fs-5">
+                      {{ getDiscountedPrice(selectedSneaker.price, selectedSneaker.discount.percentage) | number:'1.2-2' }} €
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 mt-4">
               <h6 class="fw-bold small border-bottom pb-2 mb-3 text-uppercase text-secondary" style="letter-spacing: 1px;">Gestión Multimedia</h6>
+              
+              <div *ngIf="uploadMessage" class="alert alert-success py-2 mb-3 border-0 fw-bold small animate__animated animate__fadeIn">
+                <i class="bi bi-check-circle-fill me-2"></i> {{ uploadMessage }}
+              </div>
+
               <div class="row g-2">
                 <div class="col-md-6">
                   <div class="bg-light rounded-4 p-3 text-center border-dashed border-2">
                     <p class="small fw-bold text-muted mb-2">Portada Única</p>
                     <input type="file" #singleFile hidden (change)="uploadSinglePhoto($event)">
-                    <button type="button" class="btn btn-outline-dark btn-sm rounded-pill w-100 py-2" (click)="singleFile.click()" [disabled]="isUploading">Subir Foto Principal</button>
+                    <button type="button" class="btn btn-outline-dark btn-sm rounded-pill w-100 py-2" (click)="singleFile.click()" [disabled]="isUploading">
+                      <span *ngIf="isUploading" class="spinner-border spinner-border-sm me-2"></span> Subir Foto Principal
+                    </button>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="bg-dark rounded-4 p-3 text-center text-white">
                     <p class="small fw-bold mb-2">Experiencia 360°</p>
                     <input type="file" #batchFiles hidden multiple (change)="upload360Batch($event)">
-                    <button type="button" class="btn btn-primary btn-sm rounded-pill w-100 py-2 shadow-sm" (click)="batchFiles.click()" [disabled]="isUploading">Subir Pack (36 fotos)</button>
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill w-100 py-2 shadow-sm" (click)="batchFiles.click()" [disabled]="isUploading">
+                      <span *ngIf="isUploading" class="spinner-border spinner-border-sm me-2"></span> Subir Pack (36 fotos)
+                    </button>
                   </div>
                 </div>
               </div>
@@ -239,23 +295,86 @@
             <div class="col-12 mt-4">
               <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
                 <h6 class="fw-bold small mb-0 text-uppercase text-secondary" style="letter-spacing: 1px;">Disponibilidad de Stock</h6>
-                <button type="button" class="btn btn-sm btn-dark rounded-circle" (click)="agregarNuevaTalla()"><i class="bi bi-plus"></i></button>
-              </div>
-              <div class="row row-cols-3 row-cols-md-6 row-cols-lg-8 g-2">
-                <div class="col" *ngFor="let sz of tallasDisponibles">
-                  <div class="border rounded-3 p-2 text-center bg-white shadow-sm">
-                    <label class="small d-block fw-bold text-muted mb-1">{{sz.replace('_', '.')}}</label>
-                    <input type="number" class="form-control form-control-sm text-center border-0 fw-bold" [(ngModel)]="selectedSneaker.sizes[sz]" [name]="'sz'+sz">
+                
+                <div class="d-flex align-items-center">
+                  <div *ngIf="mostrarInputTalla" class="input-group input-group-sm me-2 animate__animated animate__fadeInRight" style="width: 160px;">
+                    <input type="text" class="form-control text-center fw-bold" [(ngModel)]="nuevaTallaInput" name="nuevaTalla" placeholder="Ej: 42_5" (keyup.enter)="confirmarNuevaTalla()">
+                    <button class="btn btn-dark" type="button" (click)="confirmarNuevaTalla()"><i class="bi bi-check2"></i></button>
+                    <button class="btn btn-outline-danger" type="button" (click)="mostrarInputTalla = false"><i class="bi bi-x"></i></button>
                   </div>
+                  <button *ngIf="!mostrarInputTalla" type="button" class="btn btn-sm btn-dark rounded-circle shadow-sm" (click)="mostrarInputTalla = true; nuevaTallaInput = ''">
+                    <i class="bi bi-plus"></i>
+                  </button>
                 </div>
+
+              </div>
+              <div class="row g-3">
+                <ng-container *ngIf="getSizesKeys(selectedSneaker.sizes).length > 0; else sinTallas">
+                  <div class="col-md-4 col-sm-6" *ngFor="let sz of getSizesKeys(selectedSneaker.sizes)">
+                    <div class="input-group bg-white rounded-3 shadow-sm border p-1">
+                      <span class="input-group-text bg-light border-0 fw-bold px-3">{{ sz.replace('_', '.') }}</span>
+                      <input type="number" class="form-control border-0 text-center fw-bold fs-5" [(ngModel)]="selectedSneaker.sizes[sz]" [name]="'sz_'+sz" min="0">
+                      <button type="button" class="btn btn-light text-danger border-0" (click)="eliminarTalla(sz)">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-template #sinTallas>
+                  <div class="col-12 text-center py-4 bg-light rounded-4 border-dashed border-2">
+                    <p class="text-muted mb-0 small"><i class="bi bi-info-circle me-2"></i>Aún no has añadido ninguna talla para esta zapatilla.</p>
+                  </div>
+                </ng-template>
               </div>
             </div>
           </div>
           <div class="modal-footer border-top-0 pt-4 px-0 pb-0">
-            <button type="submit" class="btn btn-primary rounded-pill w-100 py-3 shadow-lg fw-bold">Guardar Producto en Inventario</button>
+            <button type="submit" class="btn btn-primary rounded-pill w-100 py-3 shadow-lg fw-bold" [disabled]="isSaving || isUploading">
+              {{ isSaving ? 'Guardando en base de datos...' : 'Guardar Producto en Inventario' }}
+            </button>
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
+
+<div class="modal fade" [class.show]="mostrarModal" [style.display]="mostrarModal ? 'block' : 'none'" tabindex="-1" style="z-index: 1060;">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-0 bg-light py-3 px-4">
+        <h6 class="modal-title fw-bold" [class.text-danger]="modalEsError">
+          <i class="bi" [class.bi-exclamation-octagon-fill]="modalEsError" [class.bi-check-circle-fill]="!modalEsError"></i> 
+          {{ modalTitulo }}
+        </h6>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <p class="fs-6 text-secondary mb-0">{{ modalMensaje }}</p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center pb-4">
+        <button type="button" class="btn btn-dark rounded-pill px-4 fw-bold btn-sm" (click)="cerrarAlerta()">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" [class.show]="mostrarModalConfirm" [style.display]="mostrarModalConfirm ? 'block' : 'none'" tabindex="-1" style="z-index: 1060;">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-0 bg-light py-3 px-4">
+        <h6 class="modal-title fw-bold text-danger">
+          <i class="bi bi-trash3-fill"></i> Eliminar Zapatilla
+        </h6>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <p class="fs-6 text-secondary mb-0">¿Estás seguro de que deseas eliminar este producto del catálogo? Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center pb-4 gap-2">
+        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold btn-sm" (click)="cerrarConfirmacion()">Cancelar</button>
+        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold btn-sm" (click)="ejecutarEliminarZapatilla()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="mostrarModal || mostrarModalConfirm" style="z-index: 1055;"></div>

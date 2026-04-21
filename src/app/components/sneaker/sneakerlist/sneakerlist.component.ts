@@ -131,25 +131,38 @@ export class SneakerlistComponent implements OnInit {
     this.applyFilters();
   }
 
-  applyFilters() {
-    let filtered = this.allSneakers.filter(s => {
-      const matchGender = this.selectedGenders.length === 0 || this.selectedGenders.includes(s.gender);
-      const matchBrand = this.selectedBrands.length === 0 || this.selectedBrands.includes(s.brand);
-      const matchModel = this.selectedModels.length === 0 || this.selectedModels.includes(s.model);
-      const matchSize = this.selectedSizes.length === 0 || this.selectedSizes.some(sz => {
-        if (!s.sizes) return false;
-        const sizeKey = sz.replace('.', '_');
-        return s.sizes[sizeKey] !== undefined && s.sizes[sizeKey] > 0;
-      });
-      const matchPrice = s.price <= this.currentMaxPrice;
+getEffectivePrice(s: Sneaker): number {
+  if (s.discount?.isActive && s.discount.percentage > 0) {
+    return s.price - (s.price * (s.discount.percentage / 100));
+  }
+  return s.price;
+}
 
-      return matchGender && matchBrand && matchModel && matchSize && matchPrice;
+applyFilters() {
+  let filtered = this.allSneakers.filter(s => {
+    const matchGender = this.selectedGenders.length === 0 || this.selectedGenders.includes(s.gender);
+    const matchBrand = this.selectedBrands.length === 0 || this.selectedBrands.includes(s.brand);
+    const matchModel = this.selectedModels.length === 0 || this.selectedModels.includes(s.model);
+    
+    const matchSize = this.selectedSizes.length === 0 || this.selectedSizes.some(sz => {
+      if (!s.sizes) return false;
+      const sizeKey = sz.replace('.', '_');
+      return s.sizes[sizeKey] !== undefined && s.sizes[sizeKey] > 0;
     });
 
-    if (this.currentSort === 'priceAsc') filtered.sort((a, b) => a.price - b.price);
-    else if (this.currentSort === 'priceDesc') filtered.sort((a, b) => b.price - a.price);
-    else if (this.currentSort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+    // 👇 CAMBIO CLAVE: Comparamos contra el precio efectivo (con descuento si lo hay)
+    const effectivePrice = this.getEffectivePrice(s);
+    const matchPrice = effectivePrice <= this.currentMaxPrice;
 
-    this.sneakers = filtered;
+    return matchGender && matchBrand && matchModel && matchSize && matchPrice;
+  });
+
+  if (this.currentSort === 'priceAsc') {
+    filtered.sort((a, b) => this.getEffectivePrice(a) - this.getEffectivePrice(b));
+  } else if (this.currentSort === 'priceDesc') {
+    filtered.sort((a, b) => this.getEffectivePrice(b) - this.getEffectivePrice(a));
   }
+
+  this.sneakers = filtered;
+}
 }
