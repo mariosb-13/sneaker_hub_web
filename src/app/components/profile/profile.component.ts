@@ -21,7 +21,6 @@ export class ProfileComponent implements OnInit {
 
   activeTab: 'details' | 'address' | 'password' = 'details';
 
-  // Objeto de usuario sincronizado con tu Realtime Database
   user = {
     fullName: '',
     email: '',
@@ -33,7 +32,7 @@ export class ProfileComponent implements OnInit {
     street: '',
     city: '',
     zipCode: '',
-    country: ''
+    door: '' 
   };
 
   passwords = {
@@ -45,13 +44,13 @@ export class ProfileComponent implements OnInit {
   passwordError = '';
   passwordSuccess = '';
   profileMessage = '';
+  errorMessage = ''; 
   uploadingImage = false;
 
   ngOnInit() {
     this.auth.onAuthStateChanged(async (currentUser) => {
       if (currentUser) {
         this.user.email = currentUser.email || '';
-        
         const userRef = ref(this.database, `users/${currentUser.uid}`);
         const snapshot = await get(userRef);
 
@@ -59,19 +58,19 @@ export class ProfileComponent implements OnInit {
           const data = snapshot.val();
           this.user.fullName = data.fullName || '';
           this.user.phone = data.phone || '';
-          
-          if (data.address) {
-            this.address = data.address;
-          }
-
-          // Cargamos solo la foto de la base de datos (ignora la de Google)
           this.user.profileImageUrl = data.profileImageUrl || '';
-          
-        } else {
-          this.user.profileImageUrl = '';
+          if (data.address) {
+            this.address = { ...this.address, ...data.address };
+          }
         }
       }
     });
+  }
+
+  validarSoloNumeros(campo: 'phone' | 'zipCode', valor: string) {
+    const limpio = valor.replace(/\D/g, ''); 
+    if (campo === 'phone') this.user.phone = limpio;
+    if (campo === 'zipCode') this.address.zipCode = limpio;
   }
 
   async onFileSelected(event: any) {
@@ -79,42 +78,29 @@ export class ProfileComponent implements OnInit {
     const currentUser = this.auth.currentUser;
 
     if (!file || !currentUser) return;
-
     if (!file.type.startsWith('image/')) {
-      this.profileMessage = 'Por favor, selecciona un archivo de imagen válido.';
+      this.errorMessage = 'Selecciona una imagen válida.';
       return;
     }
 
     this.uploadingImage = true;
-    this.profileMessage = 'Subiendo imagen...';
-
     try {
-      // Ruta actualizada a tu carpeta "profile_pics" en Storage
       const filePath = `profile_pics/${currentUser.uid}`;
       const fileRef = storageRef(this.storage, filePath);
-
-      // Subida del archivo
       await uploadBytes(fileRef, file);
-      
-      // Obtención de la URL de descarga
       const downloadUrl = await getDownloadURL(fileRef);
 
-      // Actualización en Realtime Database
       const userRef = ref(this.database, `users/${currentUser.uid}`);
       await update(userRef, { profileImageUrl: downloadUrl });
-
-      // Actualización opcional del perfil de Auth para persistencia
       await updateProfile(currentUser, { photoURL: downloadUrl });
 
       this.user.profileImageUrl = downloadUrl;
-      this.profileMessage = 'Foto de perfil actualizada correctamente.';
-      
+      this.profileMessage = 'Foto actualizada.';
     } catch (error) {
-      console.error('Error al subir la imagen:', error);
-      this.profileMessage = 'Hubo un error al subir la imagen.';
+      this.errorMessage = 'Error al subir la imagen.';
     } finally {
       this.uploadingImage = false;
-      setTimeout(() => this.profileMessage = '', 3000);
+      setTimeout(() => { this.profileMessage = ''; this.errorMessage = ''; }, 3000);
     }
   }
 
@@ -122,9 +108,18 @@ export class ProfileComponent implements OnInit {
     const currentUser = this.auth.currentUser;
     if (!currentUser) return;
 
+    this.errorMessage = '';
+    this.profileMessage = '';
+
+    if (!this.user.fullName || !this.user.phone || 
+        !this.address.street || !this.address.city || 
+        !this.address.zipCode || !this.address.door) {
+      this.errorMessage = 'Todos los campos son obligatorios.';
+      return;
+    }
+
     try {
       const userRef = ref(this.database, `users/${currentUser.uid}`);
-      
       await update(userRef, {
         fullName: this.user.fullName,
         phone: this.user.phone,
@@ -133,10 +128,8 @@ export class ProfileComponent implements OnInit {
 
       this.profileMessage = 'Datos guardados correctamente.';
       setTimeout(() => this.profileMessage = '', 3000);
-      
     } catch (error) {
-      console.error('Error al guardar el perfil:', error);
-      this.profileMessage = 'Error al guardar los datos.';
+      this.errorMessage = 'Error al guardar.';
     }
   }
 
@@ -145,42 +138,27 @@ export class ProfileComponent implements OnInit {
     this.passwordError = '';
     this.passwordSuccess = '';
     this.profileMessage = '';
+    this.errorMessage = '';
   }
 
   async updatePassword() {
     this.passwordError = '';
     this.passwordSuccess = '';
-
     if (!this.passwords.current || !this.passwords.new || !this.passwords.confirm) {
-      this.passwordError = 'Por favor, rellena todos los campos.';
+      this.passwordError = 'Rellena todos los campos.';
       return;
     }
     if (this.passwords.new !== this.passwords.confirm) {
-      this.passwordError = 'Las contraseñas nuevas no coinciden.';
+      this.passwordError = 'Las contraseñas no coinciden.';
       return;
     }
-    if (this.passwords.new.length < 6) {
-      this.passwordError = 'La nueva contraseña debe tener al menos 6 caracteres.';
-      return;
-    }
-
     try {
       await this.authService.changeUserPassword(this.passwords.current, this.passwords.new);
-      
-      this.passwordSuccess = 'Contraseña actualizada con éxito.';
+      this.passwordSuccess = 'Contraseña actualizada.';
       this.passwords = { current: '', new: '', confirm: '' };
-      
-      setTimeout(() => {
-        this.changeTab('details');
-      }, 2000);
-
+      setTimeout(() => this.changeTab('details'), 2000);
     } catch (error: any) {
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-        this.passwordError = 'La contraseña actual es incorrecta.';
-      } else {
-        this.passwordError = 'Error al actualizar la contraseña.';
-        console.error(error);
-      }
+      this.passwordError = 'Error al actualizar.';
     }
   }
 }

@@ -42,7 +42,7 @@ export class NavbarComponent implements OnInit {
     map(items => items.reduce((acc, item) => acc + item.cantidad, 0))
   );
 
-  brands: Brand[] = [ { name: 'All', route: '/products/all' } ];
+  brands: Brand[] = [ { name: 'Todo', route: '/products/all' } ];
 
   ngOnInit() {
     this.cargarMarcas();
@@ -52,7 +52,7 @@ export class NavbarComponent implements OnInit {
     const brandsRef = ref(this.db, 'brands');
     onValue(brandsRef, (snapshot) => {
       const data = snapshot.val();
-      this.brands = [ { name: 'All', route: '/products/all' } ];
+      this.brands = [ { name: 'Todo', route: '/products/all' } ];
       if (data) {
         Object.values(data).forEach((brand: any) => {
           const nombreRuta = brand.name.toLowerCase().replace(/\s+/g, '-');

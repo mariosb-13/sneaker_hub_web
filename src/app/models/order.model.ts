@@ -1,4 +1,4 @@
-import { SneakerCopy } from './SneakerCopy.model';
+import { SneakerCopy } from './sneakerCopy.model';
 
 export interface Order {
   order_id?: string;

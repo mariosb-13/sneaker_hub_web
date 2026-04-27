@@ -1,9 +1,10 @@
 export interface CartItem {
-  detalleCartId: string; // Ej: "idProducto_42"
+  detalleCartId: string;
   productId: string;
   name: string;
   brand?: string;
-  price: number;
+  price: number; 
+  originalPrice?: number; 
   imageUrl: string;
   tallaElegida: string;
   cantidad: number;

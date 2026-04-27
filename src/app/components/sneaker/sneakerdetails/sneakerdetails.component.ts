@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router'; 
 import { SneakerService } from '../../../services/sneaker.service';
 import { AuthService } from '../../../services/auth.service'; 
-import { CartService } from '../../../services/cart.service'; // Inyectamos el cerebro del carrito
+import { CartService } from '../../../services/cart.service';
 import { Sneaker } from '../../../models/sneaker.model';
 
 @Component({
@@ -25,54 +25,64 @@ export class SneakersdetailsComponent implements OnInit {
   sneaker: Sneaker | null = null; 
   selectedSize: string | null = null;
   
-  // Array limpio solo con las tallas disponibles 
   availableSizes: string[] = [];
-
-  // --- Variables para el visor 360 ---
   currentImageIndex: number = 0;
-  isDragging: boolean = false;
-  startX: number = 0;
 
-  async ngOnInit() {
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      if (isPlatformBrowser(this.platformId)) {
-        this.sneaker = await this.sneakerService.getSneakerById(id);
-
-        if (this.sneaker) {
-          // Procesar el objeto de tallas para filtrar las que no tienen stock
-          if (this.sneaker.sizes) {
-            this.availableSizes = Object.keys(this.sneaker.sizes)
-              .filter(key => this.sneaker!.sizes[key] > 0)
-              .map(key => key.replace('_', '.'));
-              
-            this.availableSizes.sort((a, b) => parseFloat(a) - parseFloat(b));
-          }
-
-          // Precargar las 36 imágenes para el visor
-          if (this.sneaker.images360) {
-            this.sneaker.images360.forEach(url => {
-              const img = new Image();
-              img.src = url;
-            });
-          }
-        }
-      }
+      this.loadSneaker(id);
     }
   }
 
-  selectSize(size: string) {
-    this.selectedSize = size;
+  async loadSneaker(id: string): Promise<void> {
+    try {
+      const data = await this.sneakerService.getSneakerById(id);
+      if (data) {
+        this.sneaker = data;
+        
+        if (this.sneaker && this.sneaker.sizes) {
+          this.availableSizes = Object.keys(this.sneaker.sizes)
+            .sort((a, b) => parseFloat(a.replace('_', '.')) - parseFloat(b.replace('_', '.')));
+        }
+      } else {
+        console.error('Zapatilla no encontrada');
+      }
+    } catch (error) {
+      console.error('Error al cargar la zapatilla:', error);
+    }
   }
 
-  comprarZapatilla() {
-    const usuario = this.authService.getCurrentUser(); 
+  formatSize(size: string): string {
+    return size.replace('_', '.');
+  }
 
-    if (usuario) {
-      // Si hay usuario, zapatilla y talla, lo mandamos al carrito
-      if (this.sneaker && this.selectedSize) {
+  isOutOfStock(size: string): boolean {
+    if (!this.sneaker || !this.sneaker.sizes) return true;
+    return this.sneaker.sizes[size] <= 0;
+  }
+
+  selectSize(size: string): void {
+    if (!this.isOutOfStock(size)) {
+      this.selectedSize = size;
+    }
+  }
+
+  addToCart(): void {
+    if (this.authService.getCurrentUser()) {
+      if (!this.selectedSize) {
+        alert('Por favor, selecciona una talla antes de añadir al carrito.');
+        return;
+      }
+
+      if (this.sneaker) {
+        const stockDisponible = this.sneaker.sizes![this.selectedSize];
+        if (stockDisponible <= 0) {
+           alert('Lo sentimos, esta talla está agotada.');
+           return;
+        }
+
         this.cartService.addToCart(this.sneaker, this.selectedSize);
-        // Te redirijo al carrito para que veas tu diseño en acción
         this.router.navigate(['/carrito']);
       }
     } else {
@@ -81,42 +91,7 @@ export class SneakersdetailsComponent implements OnInit {
     }
   }
 
-  // --- Lógica del Visor 360 ---
-  onDragStart(event: MouseEvent | TouchEvent) {
-    this.isDragging = true;
-    this.startX = this.getClientX(event);
-  }
-
-  onDragMove(event: MouseEvent | TouchEvent) {
-    if (!this.isDragging || !this.sneaker?.images360 || this.sneaker.images360.length === 0) return;
-
-    if (window.TouchEvent && event instanceof TouchEvent) {
-      event.preventDefault(); 
-    }
-
-    const currentX = this.getClientX(event);
-    const diff = currentX - this.startX;
-
-    if (Math.abs(diff) > 8) { 
-      if (diff > 0) {
-        this.currentImageIndex = (this.currentImageIndex - 1 + this.sneaker.images360.length) % this.sneaker.images360.length;
-      } else {
-        this.currentImageIndex = (this.currentImageIndex + 1) % this.sneaker.images360.length;
-      }
-      this.startX = currentX; 
-    }
-  }
-
-  onDragEnd() {
-    this.isDragging = false;
-  }
-
-  onSliderChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.currentImageIndex = parseInt(target.value, 10);
-  }
-
-  private getClientX(event: MouseEvent | TouchEvent): number {
-    return 'touches' in event ? event.touches[0].clientX : (event as MouseEvent).clientX;
+  updateImageIndex(event: Event) {
+    this.currentImageIndex = Number((event.target as HTMLInputElement).value);
   }
 }

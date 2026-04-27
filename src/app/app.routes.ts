@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard, redirectLoggedInTo, redirectUnauthorizedTo } from '@angular/fire/auth-guard';
 
-// Importación de Componentes
 import { LoginComponent } from './components/auth/login/login.component';
 import { SigninComponent } from './components/auth/signin/signin.component';
 import { HomeComponent } from './components/home/home.component';
@@ -18,7 +17,12 @@ import { AdminUsersComponent } from './components/admin/admin-users/admin-users.
 import { AdminProductsComponent } from './components/admin/admin-products/admin-products.component';
 import { AdminOrdersComponent } from './components/admin/admin-orders/admin-orders.component';
 
-// Guardias de navegación
+import { adminGuard } from './guards/admin.guard';
+import { successGuard } from './guards/success.guard';
+import { CancelComponent } from './components/cancel/cancel.component';
+import { cancelGuard } from './guards/cancel.guard';
+import { AdminStorageComponent } from './components/admin/admin-storage/admin-storage.component';
+
 const redirectLoggedInToHome = () => redirectLoggedInTo(['/home']);
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['/login']);
 
@@ -60,7 +64,13 @@ export const routes: Routes = [
     { 
       path: 'success', 
       component: SuccessComponent, 
-      canActivate: [AuthGuard], 
+      canActivate: [AuthGuard, successGuard], 
+      data: { authGuardPipe: redirectUnauthorizedToLogin } 
+    },
+    { 
+      path: 'cancel', 
+      component: CancelComponent, 
+      canActivate: [AuthGuard, cancelGuard], 
       data: { authGuardPipe: redirectUnauthorizedToLogin } 
     },
     { 
@@ -80,17 +90,17 @@ export const routes: Routes = [
     { 
       path: 'admin', 
       component: AdminComponent,
-      canActivate: [AuthGuard],
+      canActivate: [AuthGuard, adminGuard], 
       data: { authGuardPipe: redirectUnauthorizedToLogin },
       children: [
         { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         { path: 'dashboard', component: AdminDashboardComponent },
         { path: 'usuarios', component: AdminUsersComponent },
         { path: 'zapatillas', component: AdminProductsComponent },
-        { path: 'pedidos', component: AdminOrdersComponent }
+        { path: 'pedidos', component: AdminOrdersComponent },
+        { path: 'storage', component: AdminStorageComponent }
       ]
     },
 
-    // Comodín para rutas no encontradas
     { path: '**', redirectTo: '/home' }
 ];

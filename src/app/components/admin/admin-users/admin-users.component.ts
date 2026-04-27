@@ -1,52 +1,64 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Database, ref, onValue, update } from '@angular/fire/database';
-import { AdminTableComponent, TableColumn } from '../admin-table/admin-table.component';
+import { FormsModule } from '@angular/forms';
+import { Database, ref, list, update, remove } from '@angular/fire/database';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, AdminTableComponent],
-  template: `
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold text-dark m-0">Gestión de Usuarios</h2>
-    </div>
-
-    <app-admin-table 
-      [data]="users" 
-      [columns]="misColumnas" 
-      searchPlaceholder="Buscar usuario por nombre o correo..."
-      (onAction)="manejarAccion($event)">
-    </app-admin-table>
-  `
+  imports: [CommonModule, FormsModule],
+  templateUrl: './admin-users.component.html'
 })
 export class AdminUsersComponent implements OnInit {
   private db = inject(Database);
-  users: any[] = [];
+  
+  users$: Observable<any[]> | undefined;
+  usersList: any[] = [];
+  filteredUsers: any[] = [];
+  
+  totalUsers = 0;
+  totalAdmins = 0;
 
-  // Le decimos a la tabla qué columnas queremos y de qué tipo
-  misColumnas: TableColumn[] = [
-    { field: 'fullName', header: 'Usuario', type: 'avatar' },
-    { field: 'email', header: 'Correo Electrónico', type: 'text' },
-    { field: 'rol', header: 'Rol del Sistema', type: 'badge' }
-  ];
+  filtroBusqueda: string = '';
 
   ngOnInit() {
+    this.cargarUsuarios();
+  }
+
+  cargarUsuarios() {
     const usersRef = ref(this.db, 'users');
-    onValue(usersRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) this.users = Object.keys(data).map(k => ({ uid: k, ...data[k] }));
+    this.users$ = (list(usersRef) as Observable<any[]>).pipe(
+      map(changes => changes.map(c => ({ uid: c.key, ...c.snapshot.val() })))
+    );
+
+    this.users$.subscribe(users => {
+      this.usersList = users;
+      this.totalUsers = users.length;
+      this.totalAdmins = users.filter(u => u.rol === 'admin').length;
+      this.aplicarFiltro();
     });
   }
 
-  // Recibimos el evento de la tabla genérica
-  manejarAccion(event: { actionName: string, row: any }) {
-    if (event.actionName === 'toggleRole') {
-      const nuevoRol = event.row.rol === 'admin' ? 'cliente' : 'admin';
-      update(ref(this.db, `users/${event.row.uid}`), { rol: nuevoRol });
-    }
-    if (event.actionName === 'edit') {
-      alert('Vas a editar a: ' + event.row.fullName);
+  aplicarFiltro() {
+    this.filteredUsers = this.usersList.filter(u => 
+      u.fullName?.toLowerCase().includes(this.filtroBusqueda.toLowerCase()) ||
+      u.email?.toLowerCase().includes(this.filtroBusqueda.toLowerCase())
+    );
+  }
+
+  async cambiarRol(user: any) {
+    const nuevoRol = user.rol === 'admin' ? 'user' : 'admin';
+    const userRef = ref(this.db, `users/${user.uid}`);
+    try {
+      await update(userRef, { rol: nuevoRol });
+    } catch (e) { alert("Error al cambiar rol"); }
+  }
+
+  async eliminarUsuario(uid: string) {
+    if (confirm('¿Seguro que quieres eliminar este usuario? No hay vuelta atrás.')) {
+      const userRef = ref(this.db, `users/${uid}`);
+      await remove(userRef);
     }
   }
 }

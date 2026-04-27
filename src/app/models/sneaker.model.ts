@@ -1,3 +1,8 @@
+export interface Discount {
+  percentage: number;
+  isActive: boolean;
+}
+
 export interface Sneaker {
   id?: string;
   brand: string;
@@ -9,4 +14,5 @@ export interface Sneaker {
   isTrending: boolean;
   imageUrl: string;
   images360: string[];
+  discount?: Discount;
 }
