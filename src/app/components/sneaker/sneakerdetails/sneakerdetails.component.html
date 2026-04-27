@@ -3,7 +3,7 @@
 
     <div class="col-12 col-lg-8 mb-5 mb-lg-0">
       
-      <div class="position-relative d-flex flex-column align-items-center justify-content-center bg-white rounded-3 p-4 w-100 shadow-sm border" 
+      <div class="position-relative d-flex flex-column align-items-center justify-content-center w-100" 
            style="height: 480px;">
         
         <ng-container *ngIf="sneaker.images360 && sneaker.images360.length > 0; else staticImg">
@@ -63,7 +63,7 @@
                   class="btn rounded-0 px-3 py-2 fw-bold shadow-sm"
                   [ngClass]="{
                     'btn-dark text-white border-dark': selectedSize === size && !isOutOfStock(size),
-                    'btn-outline-dark bg-white': selectedSize !== size && !isOutOfStock(size),
+                    'btn-outline-dark': selectedSize !== size && !isOutOfStock(size), 
                     'btn-outline-secondary text-decoration-line-through opacity-50 bg-light': isOutOfStock(size)
                   }"
                   [disabled]="isOutOfStock(size)"

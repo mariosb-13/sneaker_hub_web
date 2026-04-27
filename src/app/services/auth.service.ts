@@ -95,7 +95,7 @@ export class AuthService {
   private async sendWelcomeEmail(userEmail: string, userName: string) {
     const mailCollection = collection(this.firestore, 'mail');
     const logoUrl = "https://firebasestorage.googleapis.com/v0/b/sneakerhub-3862d.firebasestorage.app/o/SneakerHub.png?alt=media&token=a42e0979-51b2-4a72-ad48-b8a9974ad37a";
-    const webUrl = "https://sneaker-hub-web.onrender.com";
+    const webUrl = "https://sneakerHub.es";
 
     const welcomeHtml = `
       <div style="background-color: #f4f4f4; padding: 40px 0; font-family: Arial, sans-serif;">

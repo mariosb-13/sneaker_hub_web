@@ -41,7 +41,6 @@ export class CartService {
     return this.cartSubject.asObservable();
   }
 
-  // Añade esta función privada al principio de la clase CartService
 private calcularPrecioFinal(sneaker: Sneaker): number {
   if (sneaker.discount?.isActive && sneaker.discount.percentage > 0) {
     return sneaker.price * (1 - sneaker.discount.percentage / 100);
@@ -49,7 +48,6 @@ private calcularPrecioFinal(sneaker: Sneaker): number {
   return sneaker.price;
 }
 
-// Modifica el método addToCart
 addToCart(sneaker: Sneaker, size: string) {
   const user = this.auth.currentUser;
   if (!user) return;
@@ -58,7 +56,6 @@ addToCart(sneaker: Sneaker, size: string) {
   const detalleCartId = `${sneaker.id}_${tallaFormateada}`;
   const existingItem = this.cartItems.find(item => item.detalleCartId === detalleCartId);
 
-  // Calculamos el precio que realmente se va a cobrar
   const precioFinal = this.calcularPrecioFinal(sneaker);
 
   if (existingItem) {

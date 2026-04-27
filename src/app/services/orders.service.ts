@@ -44,7 +44,6 @@ export class OrdersService {
     if (snapshot.exists()) {
       const order = snapshot.val() as Order;
       
-      // Aseguramos que los productos comprados sean un array
       if (order.purchased_sneakers && !Array.isArray(order.purchased_sneakers)) {
         order.purchased_sneakers = Object.values(order.purchased_sneakers);
       }

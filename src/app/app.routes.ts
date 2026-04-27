@@ -23,7 +23,6 @@ import { CancelComponent } from './components/cancel/cancel.component';
 import { cancelGuard } from './guards/cancel.guard';
 import { AdminStorageComponent } from './components/admin/admin-storage/admin-storage.component';
 
-// Guardias de navegación de Firebase
 const redirectLoggedInToHome = () => redirectLoggedInTo(['/home']);
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['/login']);
 
@@ -103,6 +102,5 @@ export const routes: Routes = [
       ]
     },
 
-    // Comodín para rutas no encontradas
     { path: '**', redirectTo: '/home' }
 ];
