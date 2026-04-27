@@ -79,4 +79,9 @@ addBrand(brand: any) {
   const brandRef = ref(this.db, `brands/${brandKey}`);
   return set(brandRef, brand);
 }
+
+deleteBrand(key: string) {
+  const brandRef = ref(this.db, `brands/${key}`);
+  return remove(brandRef);
+}
 }

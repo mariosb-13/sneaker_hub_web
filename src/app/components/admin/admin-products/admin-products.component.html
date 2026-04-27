@@ -182,11 +182,18 @@
             </div>
           </div>
           
-          <div class="mt-4 pt-3 border-top">
-            <button class="btn btn-primary rounded-pill w-100 py-3 fw-bold shadow-lg" 
+         <div class="mt-4 pt-3 border-top d-flex gap-2">
+            
+            <button *ngIf="isEditingBrand" class="btn btn-danger rounded-pill px-4 py-3 shadow-sm" 
+                    (click)="eliminarMarca()" title="Eliminar Marca">
+              <i class="bi bi-trash3-fill"></i>
+            </button>
+            
+            <button class="btn btn-primary rounded-pill flex-grow-1 py-3 fw-bold shadow-lg" 
                     (click)="guardarMarca()" [disabled]="!newBrand.name || !newBrand.icon">
               {{ isEditingBrand ? 'Sincronizar Cambios' : 'Registrar Marca' }}
             </button>
+            
           </div>
         </div>
       </div>

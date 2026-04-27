@@ -242,6 +242,23 @@ export class AdminProductsComponent implements OnInit {
     }
   }
 
+  async eliminarMarca() {
+    if (!this.newBrand.key) {
+      this.mostrarAlerta('Error', 'Falta el identificador de la marca.', true);
+      return;
+    }
+    
+    if (confirm(`¿Estás seguro de que deseas eliminar la marca "${this.newBrand.name}"? Esta acción no se puede deshacer.`)) {
+      try {
+        await this.sneakerService.deleteBrand(this.newBrand.key);
+        this.mostrarAlerta('Marca eliminada', `La marca ${this.newBrand.name} ha sido borrada del sistema.`, false);
+        this.cancelarEdicionMarca();
+      } catch (error) { 
+        this.mostrarAlerta('Error', 'No se pudo eliminar la marca.', true); 
+      }
+    }
+  }
+
   async guardarZapatilla() {
     if (!this.selectedSneaker.name || this.isSaving || this.isUploading) return;
     

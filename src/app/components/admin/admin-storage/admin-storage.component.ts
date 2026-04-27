@@ -123,6 +123,29 @@ export class AdminStorageComponent implements OnInit {
   toggleFolder(folder: StorageFolder) { folder.isExpanded = !folder.isExpanded; }
   toggleAll(expand: boolean) { this.filteredFolders.forEach(f => f.isExpanded = expand); }
 
+  async deleteFolder(folder: StorageFolder) {
+    if (!confirm(`¿Estás MEGA SEGURO de que quieres borrar la carpeta entera "${folder.folderName}" con sus ${folder.files.length} imágenes? Esta acción NO se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const deletePromises = folder.files.map(file => 
+        deleteObject(storageRef(this.storage, file.fullPath))
+      );
+
+      await Promise.all(deletePromises);
+
+      this.folders = this.folders.filter(f => f.folderName !== folder.folderName);
+      
+      this.applyFilter();
+      
+      alert(`La carpeta "${folder.folderName}" ha sido vaporizada con éxito.`);
+
+    } catch (error) {
+      console.error('Error al borrar la carpeta entera:', error);
+      alert('Hubo un error. Puede que se hayan borrado algunas fotos pero no todas.');
+    }
+  }
   async deleteFile(folder: StorageFolder, file: StorageFile) {
     if (!confirm(`¿Eliminar permanentemente "${file.name}"?`)) return;
     try {
