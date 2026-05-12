@@ -8,7 +8,8 @@ import {
   signOut,
   EmailAuthProvider,
   reauthenticateWithCredential,
-  updatePassword
+  updatePassword,
+  sendPasswordResetEmail
 } from '@angular/fire/auth';
 import { Database, ref, set, get } from '@angular/fire/database';
 import { Firestore, collection, addDoc } from '@angular/fire/firestore';
@@ -128,6 +129,11 @@ export class AuthService {
     const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
     await reauthenticateWithCredential(currentUser, credential);
     await updatePassword(currentUser, newPassword);
+  }
+
+  // RECUPERAR CONTRASEÑA
+  resetPassword(email: string) {
+    return sendPasswordResetEmail(this.auth, email);
   }
 
   // CERRAR SESIÓN

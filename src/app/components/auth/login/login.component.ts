@@ -12,6 +12,7 @@ import { AuthService } from '../../../services/auth.service';
 export class LoginComponent {
   correo: string = '';
   password: string = '';
+  errorMessage: string = '';
 
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -32,5 +33,26 @@ export class LoginComponent {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  resetPassword(event: Event) {
+    event.preventDefault();
+    
+    if (!this.correo) {
+      this.errorMessage = 'Por favor, escribe tu correo arriba para enviarte el enlace de recuperación.';
+      alert(this.errorMessage); 
+      return;
+    }
+
+    this.authService.resetPassword(this.correo)
+      .then(() => {
+        this.errorMessage = ''; 
+        alert('¡Correo de recuperación enviado! Revisa tu bandeja de entrada (y la carpeta de Spam).');
+      })
+      .catch((error: any) => {
+        this.errorMessage = 'Error al enviar el correo. Verifica que la dirección esté bien escrita y registrada.';
+        alert(this.errorMessage);
+        console.error('Error reset password:', error);
+      });
   }
 }
