@@ -7,7 +7,7 @@
 Este repositorio abarca la fase de **Maquetación y Diseño de Interfaz**, con el objetivo de establecer una arquitectura visual robusta, escalable y altamente responsiva. El desarrollo se ha centrado en la implementación de patrones de diseño modernos, priorizando la experiencia de usuario en dispositivos móviles (Mobile First) sin comprometer la funcionalidad en entornos de escritorio.
 
 **Demo en producción:**
-[https://sneaker-hub-web.onrender.com](https://sneaker-hub-web.onrender.com)
+[https://sneakerhub.es](https://sneakerhub.es)
 
 ---
 
