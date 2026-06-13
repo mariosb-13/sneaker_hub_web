@@ -15,58 +15,101 @@
       <h3 class="text-center mb-4 text-dark">Únete a nosotros</h3>
 
       <form>
-        <div class="input-group mb-3">
-          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
-            <i class="bi bi-person fs-5"></i>
-          </span>
-          <input type="text" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Nombre" name="nombre" [(ngModel)]="nombre">
+        <!-- Nombre -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3" 
+              [ngClass]="{'text-danger': nombre && nombre.length < 2, 'text-success': nombre && nombre.length >= 2, 'text-secondary': !nombre}">
+              <i class="bi bi-person fs-5"></i>
+            </span>
+            <input type="text" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+              placeholder="Nombre" name="nombre" [(ngModel)]="nombre"
+              [ngClass]="{'border-danger': nombre && nombre.length < 2, 'border-success': nombre && nombre.length >= 2}">
+          </div>
+          <small class="text-danger ms-3" *ngIf="nombre && nombre.length < 2">
+            <i class="bi bi-exclamation-circle me-1"></i>Mínimo 2 caracteres
+          </small>
         </div>
 
-        <div class="input-group mb-3">
-          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
-            <i class="bi bi-at fs-5"></i>
-          </span>
-          <input type="email" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Correo" name="correo" [(ngModel)]="correo">
+        <!-- Correo -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3" 
+              [ngClass]="{'text-danger': correo && !isValidEmail(correo), 'text-success': correo && isValidEmail(correo), 'text-secondary': !correo}">
+              <i class="bi bi-at fs-5"></i>
+            </span>
+            <input type="email" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+              placeholder="Correo" name="correo" [(ngModel)]="correo"
+              [ngClass]="{'border-danger': correo && !isValidEmail(correo), 'border-success': correo && isValidEmail(correo)}">
+          </div>
+          <small class="text-danger ms-3" *ngIf="correo && !isValidEmail(correo)">
+            <i class="bi bi-exclamation-circle me-1"></i>Correo inválido
+          </small>
         </div>
 
-        <div class="input-group mb-3">
-          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
-            <i class="bi bi-telephone fs-5"></i>
-          </span>
-          <input type="tel" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Teléfono" name="telefono" [(ngModel)]="telefono">
+        <!-- Teléfono (opcional) -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
+              <i class="bi bi-telephone fs-5"></i>
+            </span>
+            <input type="tel" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+              placeholder="Teléfono (Opcional)" name="telefono" [(ngModel)]="telefono">
+          </div>
+          <small class="text-muted ms-3">Este campo es opcional</small>
         </div>
 
-        <div class="input-group mb-3">
-          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
-            <i class="bi bi-key fs-5"></i>
-          </span>
-          <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Contraseña" name="password" [(ngModel)]="password">
+        <!-- Contraseña -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3" 
+              [ngClass]="{'text-danger': password && password.length < 6, 'text-success': password && password.length >= 6, 'text-secondary': !password}">
+              <i class="bi bi-key fs-5"></i>
+            </span>
+            <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+              placeholder="Contraseña" name="password" [(ngModel)]="password"
+              [ngClass]="{'border-danger': password && password.length < 6, 'border-success': password && password.length >= 6}">
+          </div>
+          <small class="text-danger ms-3" *ngIf="password && password.length < 6">
+            <i class="bi bi-exclamation-circle me-1"></i>Mínimo 6 caracteres
+          </small>
         </div>
 
-        <div class="input-group mb-4">
-          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
-            <i class="bi bi-key fs-5"></i>
-          </span>
-          <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Repetir Contraseña" name="passwordRepeat" [(ngModel)]="passwordRepeat">
+        <!-- Repetir Contraseña -->
+        <div class="mb-4">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3" 
+              [ngClass]="{'text-danger': passwordRepeat && password !== passwordRepeat, 'text-success': passwordRepeat && password === passwordRepeat && password.length >= 6, 'text-secondary': !passwordRepeat}">
+              <i class="bi bi-key fs-5"></i>
+            </span>
+            <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+              placeholder="Repetir Contraseña" name="passwordRepeat" [(ngModel)]="passwordRepeat"
+              [ngClass]="{'border-danger': passwordRepeat && password !== passwordRepeat, 'border-success': passwordRepeat && password === passwordRepeat && password.length >= 6}">
+          </div>
+          <small class="text-danger ms-3" *ngIf="passwordRepeat && password !== passwordRepeat">
+            <i class="bi bi-exclamation-circle me-1"></i>Las contraseñas no coinciden
+          </small>
         </div>
 
+        <!-- Botón Registrarse -->
         <div class="d-grid gap-2 mb-3">
-          <button class="btn rounded-pill py-2 text-white bg-black" type="button" (click)="registrar()">
-            Registrarse
+          <button class="btn rounded-pill py-2 text-white bg-black" type="button" (click)="registrar()"
+            [disabled]="cargando || !nombre || !correo || !password || !passwordRepeat || nombre.length < 2 || !isValidEmail(correo) || password.length < 6 || password !== passwordRepeat">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ cargando ? 'Registrando...' : 'Registrarse' }}
           </button>
         </div>
 
+        <!-- Botón Google -->
         <div class="d-grid gap-2 mb-4">
-          <button class="btn btn-danger rounded-pill py-2" type="button" (click)="continuarConGoogle()">
-            <i class="bi bi-google me-2"></i> Continuar con Google
+          <button class="btn btn-danger rounded-pill py-2" type="button" (click)="continuarConGoogle()" [disabled]="cargando">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i class="bi bi-google me-2" *ngIf="!cargando"></i> 
+            {{ cargando ? 'Autenticando...' : 'Continuar con Google' }}
           </button>
         </div>
 
+        <!-- Link a Login -->
         <div class="text-center">
           <span class="text-secondary small">¿Tienes una cuenta? </span>
           <a routerLink="/login" class="text-decoration-none text-dark small fw-bold text-decoration-underline"

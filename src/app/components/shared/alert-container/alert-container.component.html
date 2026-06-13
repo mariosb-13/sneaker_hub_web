@@ -1,0 +1,10 @@
+<div class="alert-container">
+  <div *ngFor="let alert of alerts" [ngClass]="getAlertClass(alert.type)" class="alert alert-dismissible fade show d-flex align-items-start gap-3" role="alert">
+    <i [ngClass]="getIcon(alert.type)" class="bi mt-1 flex-shrink-0"></i>
+    <div class="flex-grow-1">
+      <strong *ngIf="alert.title">{{ alert.title }}</strong>
+      <p *ngIf="alert.message" [ngClass]="{'mt-2': alert.title, 'mb-0': true}">{{ alert.message }}</p>
+    </div>
+    <button type="button" class="btn-close" (click)="removeAlert(alert.id)" aria-label="Close"></button>
+  </div>
+</div>

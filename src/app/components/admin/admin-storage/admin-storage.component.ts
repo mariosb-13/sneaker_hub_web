@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Storage, ref as storageRef, listAll, getDownloadURL, deleteObject, uploadBytes } from '@angular/fire/storage';
+import { AlertService } from '../../../services/alert.service';
 
 interface StorageFile {
   name: string;
@@ -30,6 +31,13 @@ export class AdminStorageComponent implements OnInit {
   isLoading = true;
   isUploading = false; // Estado global de subida
   searchTerm: string = '';
+  
+  mostrarModalConfirm: boolean = false;
+  carpetaAEliminar: StorageFolder | null = null;
+  archivoAEliminar: StorageFile | null = null;
+  carpetaDelArchivo: StorageFolder | null = null;
+
+  private alertService = inject(AlertService);
 
   constructor(private storage: Storage) {}
 
@@ -102,11 +110,11 @@ export class AdminStorageComponent implements OnInit {
       folder.files.push(...newFiles);
       if (!folder.thumbnailUrl) folder.thumbnailUrl = newFiles[0].url;
       
-      alert(`¡${newFiles.length} archivo(s) subido(s) con éxito!`);
+      this.alertService.success('Archivos subidos', `${newFiles.length} archivo(s) subido(s) con éxito!`);
 
     } catch (error) {
       console.error('Error en la subida:', error);
-      alert('Error al subir los archivos.');
+      this.alertService.error('Error', 'No fue posible subir los archivos. Intenta de nuevo.');
     } finally {
       this.isUploading = false;
       event.target.value = ''; // Limpiamos el input
@@ -123,34 +131,70 @@ export class AdminStorageComponent implements OnInit {
   toggleFolder(folder: StorageFolder) { folder.isExpanded = !folder.isExpanded; }
   toggleAll(expand: boolean) { this.filteredFolders.forEach(f => f.isExpanded = expand); }
 
-  async deleteFolder(folder: StorageFolder) {
-    if (!confirm(`¿Estás MEGA SEGURO de que quieres borrar la carpeta entera "${folder.folderName}" con sus ${folder.files.length} imágenes? Esta acción NO se puede deshacer.`)) {
-      return;
+  pedirConfirmacionEliminarCarpeta(folder: StorageFolder) {
+    this.carpetaAEliminar = folder;
+    this.archivoAEliminar = null;
+    this.mostrarModalConfirm = true;
+  }
+
+  pedirConfirmacionEliminarArchivo(folder: StorageFolder, file: StorageFile) {
+    this.carpetaAEliminar = null;
+    this.archivoAEliminar = file;
+    this.carpetaDelArchivo = folder;
+    this.mostrarModalConfirm = true;
+  }
+
+  cerrarModalConfirm() {
+    this.mostrarModalConfirm = false;
+    this.carpetaAEliminar = null;
+    this.archivoAEliminar = null;
+    this.carpetaDelArchivo = null;
+  }
+
+  async confirmarEliminar() {
+    if (this.carpetaAEliminar) {
+      await this.confirmarEliminarCarpeta();
+    } else if (this.archivoAEliminar && this.carpetaDelArchivo) {
+      await this.confirmarEliminarArchivo();
     }
+  }
+
+  async confirmarEliminarCarpeta() {
+    if (!this.carpetaAEliminar) return;
 
     try {
-      const deletePromises = folder.files.map(file => 
+      const deletePromises = this.carpetaAEliminar.files.map(file => 
         deleteObject(storageRef(this.storage, file.fullPath))
       );
 
       await Promise.all(deletePromises);
 
-      this.folders = this.folders.filter(f => f.folderName !== folder.folderName);
+      this.folders = this.folders.filter(f => f.folderName !== this.carpetaAEliminar!.folderName);
       
       this.applyFilter();
       
-      alert(`La carpeta "${folder.folderName}" ha sido vaporizada con éxito.`);
+      this.alertService.success('Carpeta eliminada', `La carpeta "${this.carpetaAEliminar.folderName}" ha sido eliminada correctamente.`);
 
     } catch (error) {
       console.error('Error al borrar la carpeta entera:', error);
-      alert('Hubo un error. Puede que se hayan borrado algunas fotos pero no todas.');
+      this.alertService.error('Error', 'No fue posible eliminar la carpeta. Algunos archivos podrían no haberse eliminado correctamente.');
+    } finally {
+      this.cerrarModalConfirm();
     }
   }
-  async deleteFile(folder: StorageFolder, file: StorageFile) {
-    if (!confirm(`¿Eliminar permanentemente "${file.name}"?`)) return;
+
+  async confirmarEliminarArchivo() {
+    if (!this.archivoAEliminar || !this.carpetaDelArchivo) return;
+
     try {
-      await deleteObject(storageRef(this.storage, file.fullPath));
-      folder.files = folder.files.filter(f => f.fullPath !== file.fullPath);
-    } catch (error) { console.error(error); }
+      await deleteObject(storageRef(this.storage, this.archivoAEliminar.fullPath));
+      this.carpetaDelArchivo.files = this.carpetaDelArchivo.files.filter(f => f.fullPath !== this.archivoAEliminar!.fullPath);
+      this.alertService.success('Archivo eliminado', `"${this.archivoAEliminar.name}" ha sido eliminado correctamente.`);
+    } catch (error) {
+      console.error(error);
+      this.alertService.error('Error', 'No fue posible eliminar el archivo. Intenta de nuevo.');
+    } finally {
+      this.cerrarModalConfirm();
+    }
   }
 }

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SneakerService } from '../../../services/sneaker.service';
 import { AuthService } from '../../../services/auth.service'; 
 import { CartService } from '../../../services/cart.service';
+import { AlertService } from '../../../services/alert.service';
 import { Sneaker } from '../../../models/sneaker.model';
 
 @Component({
@@ -18,7 +19,8 @@ export class SneakersdetailsComponent implements OnInit {
   private router = inject(Router);
   private sneakerService = inject(SneakerService);
   private authService = inject(AuthService);
-  private cartService = inject(CartService); 
+  private cartService = inject(CartService);
+  private alertService = inject(AlertService);
   
   private platformId = inject(PLATFORM_ID); 
 
@@ -71,22 +73,23 @@ export class SneakersdetailsComponent implements OnInit {
   addToCart(): void {
     if (this.authService.getCurrentUser()) {
       if (!this.selectedSize) {
-        alert('Por favor, selecciona una talla antes de añadir al carrito.');
+        this.alertService.warning('Talla no seleccionada', 'Por favor, selecciona una talla antes de añadir al carrito.');
         return;
       }
 
       if (this.sneaker) {
         const stockDisponible = this.sneaker.sizes![this.selectedSize];
         if (stockDisponible <= 0) {
-           alert('Lo sentimos, esta talla está agotada.');
-           return;
+          this.alertService.warning('Sin stock', 'Lo sentimos, esta talla no está disponible en este momento.');
+          return;
         }
 
         this.cartService.addToCart(this.sneaker, this.selectedSize);
+        this.alertService.success('Producto añadido', 'El artículo ha sido añadido al carrito correctamente.');
         this.router.navigate(['/carrito']);
       }
     } else {
-      alert('¡Tienes que iniciar sesión para poder comprar!');
+      this.alertService.warning('Sesión requerida', 'Por favor, inicia sesión para poder comprar.');
       this.router.navigate(['/signin']); 
     }
   }

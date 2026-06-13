@@ -48,7 +48,7 @@
       <div class="mb-3 d-flex justify-content-between align-items-center">
         
         <button class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm" 
-                (click)="deleteFolder(folder)">
+                (click)="pedirConfirmacionEliminarCarpeta(folder)">
           <i class="bi bi-trash-fill me-1"></i> Borrar carpeta
         </button>
 
@@ -71,7 +71,7 @@
             </div>
             <div class="card-body p-2 text-center bg-white border-top">
               <small class="d-block text-truncate text-muted mb-2" style="font-size: 0.65rem;">{{ file.name }}</small>
-              <button class="btn btn-outline-danger btn-sm w-100 border-0" (click)="deleteFile(folder, file)">
+              <button class="btn btn-outline-danger btn-sm w-100 border-0" (click)="pedirConfirmacionEliminarArchivo(folder, file)">
                 <i class="bi bi-trash3"></i>
               </button>
             </div>
@@ -81,3 +81,52 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de Confirmación Personalizado -->
+<div class="modal fade" [class.show]="mostrarModalConfirm" [style.display]="mostrarModalConfirm ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+      <div class="modal-header border-0 bg-danger bg-opacity-10 p-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle bg-danger bg-opacity-25 p-3">
+            <i class="bi bi-exclamation-triangle text-danger fs-5"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-dark m-0">
+              <span *ngIf="carpetaAEliminar">¿Eliminar carpeta?</span>
+              <span *ngIf="archivoAEliminar">¿Eliminar archivo?</span>
+            </h5>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div *ngIf="carpetaAEliminar">
+          <p class="text-muted mb-0">
+            Esta acción eliminará permanentemente la carpeta <strong>"{{ carpetaAEliminar.folderName }}"</strong> 
+            con sus <strong>{{ carpetaAEliminar.files.length }} imágenes</strong>.
+            <br><br>
+            <span class="text-danger fw-semibold">⚠️ Esta acción no se puede deshacer.</span>
+          </p>
+        </div>
+        <div *ngIf="archivoAEliminar">
+          <p class="text-muted mb-0">
+            Esta acción eliminará permanentemente el archivo <strong>"{{ archivoAEliminar.name }}"</strong>.
+            <br><br>
+            <span class="text-danger fw-semibold">⚠️ Esta acción no se puede deshacer.</span>
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer border-0 p-4 gap-2">
+        <button type="button" class="btn btn-secondary rounded-pill px-4" (click)="cerrarModalConfirm()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold" (click)="confirmarEliminar()">
+          <i class="bi bi-trash me-2"></i>Eliminar Permanentemente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop del Modal -->
+<div class="modal-backdrop fade" [class.show]="mostrarModalConfirm" *ngIf="mostrarModalConfirm" (click)="cerrarModalConfirm()"></div>

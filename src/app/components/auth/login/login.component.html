@@ -15,40 +15,65 @@
       <h3 class="text-center mb-4 text-dark">Iniciar Sesión</h3>
 
       <form>
-        <div class="input-group mb-3">
-          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
-            <i class="bi bi-at fs-5"></i>
-          </span>
-          <input type="email" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Correo" name="correo" [(ngModel)]="correo">
+        <!-- Email Input -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3" 
+              [ngClass]="{'text-danger': correo && !isValidEmail(correo), 'text-success': correo && isValidEmail(correo), 'text-secondary': !correo}">
+              <i class="bi bi-at fs-5"></i>
+            </span>
+            <input type="email" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+              placeholder="Correo" name="correo" [(ngModel)]="correo"
+              [ngClass]="{'border-danger': correo && !isValidEmail(correo), 'border-success': correo && isValidEmail(correo)}">
+          </div>
+          <small class="text-danger ms-3" *ngIf="correo && !isValidEmail(correo)">
+            <i class="bi bi-exclamation-circle me-1"></i>Correo inválido
+          </small>
         </div>
 
-        <div class="input-group mb-2">
-          <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3 text-secondary">
-            <i class="bi bi-key fs-5"></i>
-          </span>
-          <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
-            placeholder="Contraseña" name="password" [(ngModel)]="password">
+        <!-- Password Input -->
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3" 
+              [ngClass]="{'text-danger': password && password.length < 1, 'text-success': password && password.length >= 1, 'text-secondary': !password}">
+              <i class="bi bi-key fs-5"></i>
+            </span>
+            <input type="password" class="form-control bg-white border-start-0 rounded-end-pill py-2 shadow-none"
+              placeholder="Contraseña" name="password" [(ngModel)]="password"
+              (keyup.enter)="!cargando && correo && password && isValidEmail(correo) && iniciarSesion()"
+              [ngClass]="{'border-danger': password && password.length < 1, 'border-success': password && password.length >= 1}">
+          </div>
+          <small class="text-danger ms-3" *ngIf="password && password.length < 1">
+            <i class="bi bi-exclamation-circle me-1"></i>La contraseña es requerida
+          </small>
         </div>
 
+        <!-- Forgot Password Link -->
         <div class="mb-4">
-          <a href="#" (click)="resetPassword($event)" class="text-decoration-none small text-muted text-end mb-4 d-block">
+          <a href="#" (click)="resetPassword($event)" class="text-decoration-none small text-muted text-end d-block">
             ¿Has olvidado tu contraseña?
           </a>
         </div>
 
+        <!-- Login Button -->
         <div class="d-grid gap-2 mb-3">
-          <button class="btn rounded-pill py-2 text-white bg-black" type="button" (click)="iniciarSesion()">
-            Iniciar Sesión
+          <button class="btn rounded-pill py-2 text-white bg-black" type="button" (click)="iniciarSesion()"
+            [disabled]="cargando || !correo || !password || (correo && !isValidEmail(correo))">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ cargando ? 'Cargando...' : 'Iniciar Sesión' }}
           </button>
         </div>
 
+        <!-- Google Button -->
         <div class="d-grid gap-2 mb-4">
-          <button class="btn btn-danger rounded-pill py-2" type="button" (click)="loginConGoogle()">
-            <i class="bi bi-google me-2"></i> Iniciar Sesión con Google
+          <button class="btn btn-danger rounded-pill py-2" type="button" (click)="loginConGoogle()" [disabled]="cargando">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i class="bi bi-google me-2" *ngIf="!cargando"></i> 
+            {{ cargando ? 'Autenticando...' : 'Iniciar Sesión con Google' }}
           </button>
         </div>
 
+        <!-- Sign Up Link -->
         <div class="text-center">
           <span class="text-secondary small">¿No tienes cuenta? </span>
           <a routerLink="/signin" class="text-decoration-none text-dark small fw-bold text-decoration-underline">

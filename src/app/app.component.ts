@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from "./components/footer/footer.component";
+import { AlertContainerComponent } from './components/shared/alert-container/alert-container.component';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router'; 
 import { filter } from 'rxjs/operators'; 
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [NavbarComponent, FooterComponent, RouterOutlet, CommonModule], 
+  imports: [NavbarComponent, FooterComponent, AlertContainerComponent, RouterOutlet, CommonModule], 
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

@@ -42,6 +42,7 @@ export class AdminProductsComponent implements OnInit {
 
   mostrarModalConfirm: boolean = false;
   itemAEliminar: string | null = null;
+  tipoItemAEliminar: 'zapatilla' | 'marca' | null = null;
 
   mostrarInputTalla: boolean = false;
   nuevaTallaInput: string = '';
@@ -61,14 +62,10 @@ export class AdminProductsComponent implements OnInit {
     this.mostrarModal = false; 
   }
 
-  pedirConfirmacionEliminar(id: string) {
+  pedirConfirmacionEliminar(id: string, tipo: 'zapatilla' | 'marca' = 'zapatilla') {
     this.itemAEliminar = id;
+    this.tipoItemAEliminar = tipo;
     this.mostrarModalConfirm = true;
-  }
-
-  cerrarConfirmacion() { 
-    this.mostrarModalConfirm = false; 
-    this.itemAEliminar = null; 
   }
 
   initBrand() {
@@ -248,14 +245,36 @@ export class AdminProductsComponent implements OnInit {
       return;
     }
     
-    if (confirm(`¿Estás seguro de que deseas eliminar la marca "${this.newBrand.name}"? Esta acción no se puede deshacer.`)) {
-      try {
-        await this.sneakerService.deleteBrand(this.newBrand.key);
-        this.mostrarAlerta('Marca eliminada', `La marca ${this.newBrand.name} ha sido borrada del sistema.`, false);
-        this.cancelarEdicionMarca();
-      } catch (error) { 
-        this.mostrarAlerta('Error', 'No se pudo eliminar la marca.', true); 
-      }
+    this.itemAEliminar = this.newBrand.key;
+    this.tipoItemAEliminar = 'marca';
+    this.mostrarModalConfirm = true;
+  }
+
+  cerrarConfirmacion() { 
+    this.mostrarModalConfirm = false; 
+    this.itemAEliminar = null;
+    this.tipoItemAEliminar = null;
+  }
+
+  async confirmarEliminar() {
+    if (this.tipoItemAEliminar === 'zapatilla') {
+      await this.ejecutarEliminarZapatilla();
+    } else if (this.tipoItemAEliminar === 'marca') {
+      await this.confirmarEliminarMarca();
+    }
+  }
+
+  async confirmarEliminarMarca() {
+    if (!this.newBrand.key) return;
+
+    try {
+      await this.sneakerService.deleteBrand(this.newBrand.key);
+      this.mostrarAlerta('Marca eliminada', `La marca ${this.newBrand.name} ha sido borrada del sistema.`, false);
+      this.cancelarEdicionMarca();
+    } catch (error) { 
+      this.mostrarAlerta('Error', 'No se pudo eliminar la marca.', true); 
+    } finally {
+      this.cerrarConfirmacion();
     }
   }
 

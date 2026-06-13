@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Database, ref, onValue, update } from '@angular/fire/database';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-admin-orders',
@@ -11,6 +12,7 @@ import { Database, ref, onValue, update } from '@angular/fire/database';
 })
 export class AdminOrdersComponent implements OnInit {
   private db = inject(Database);
+  private alertService = inject(AlertService);
   
   pedidos: any[] = [];
   pendientes: number = 0;
@@ -100,7 +102,7 @@ export class AdminOrdersComponent implements OnInit {
       
     } catch (error) {
       console.error("Error al actualizar estado:", error);
-      alert("Hubo un error al intentar actualizar el estado del pedido.");
+      this.alertService.error('Error', 'No fue posible actualizar el estado del pedido. Intenta de nuevo.');
     }
   }
 }

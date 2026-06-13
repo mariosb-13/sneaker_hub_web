@@ -98,7 +98,7 @@
           <td class="pe-4 text-end">
             <div class="btn-group">
               <button class="btn btn-sm btn-outline-light border-0 text-primary p-2" (click)="abrirModalEditar(s)" data-bs-toggle="modal" data-bs-target="#sneakerModal"><i class="bi bi-pencil-square fs-5"></i></button>
-              <button class="btn btn-sm btn-outline-light border-0 text-danger p-2" (click)="pedirConfirmacionEliminar(s.id!)"><i class="bi bi-trash3-fill fs-5"></i></button>
+              <button class="btn btn-sm btn-outline-light border-0 text-danger p-2" (click)="pedirConfirmacionEliminar(s.id!, 'zapatilla')"><i class="bi bi-trash3-fill fs-5"></i></button>
             </div>
           </td>
         </tr>
@@ -370,15 +370,22 @@
     <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
       <div class="modal-header border-0 bg-light py-3 px-4">
         <h6 class="modal-title fw-bold text-danger">
-          <i class="bi bi-trash3-fill"></i> Eliminar Zapatilla
+          <i class="bi bi-trash3-fill"></i>
+          <span *ngIf="tipoItemAEliminar === 'zapatilla'"> Eliminar Zapatilla</span>
+          <span *ngIf="tipoItemAEliminar === 'marca'"> Eliminar Marca</span>
         </h6>
       </div>
       <div class="modal-body p-4 text-center">
-        <p class="fs-6 text-secondary mb-0">¿Estás seguro de que deseas eliminar este producto del catálogo? Esta acción no se puede deshacer.</p>
+        <div *ngIf="tipoItemAEliminar === 'zapatilla'">
+          <p class="fs-6 text-secondary mb-0">¿Estás seguro de que deseas eliminar este producto del catálogo? Esta acción no se puede deshacer.</p>
+        </div>
+        <div *ngIf="tipoItemAEliminar === 'marca'">
+          <p class="fs-6 text-secondary mb-0">¿Estás seguro de que deseas eliminar la marca <strong>"{{ newBrand.name }}"</strong>? Esta acción no se puede deshacer.</p>
+        </div>
       </div>
       <div class="modal-footer border-0 justify-content-center pb-4 gap-2">
         <button type="button" class="btn btn-light rounded-pill px-4 fw-bold btn-sm" (click)="cerrarConfirmacion()">Cancelar</button>
-        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold btn-sm" (click)="ejecutarEliminarZapatilla()">Eliminar</button>
+        <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold btn-sm" (click)="confirmarEliminar()">Eliminar</button>
       </div>
     </div>
   </div>
